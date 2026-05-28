@@ -86,7 +86,7 @@ Phase 6: Validation & Testing
 
 #### Install the plugin
 ```shell
-/plugin install harness-marketplace
+/plugin install harness@harness-marketplace
 ```
 
 ### Direct Installation as Global Skill
