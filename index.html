@@ -3,7 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Harness — Agent Team & Skill Architect for Claude Code</title>
+<title>pi-agent-harness — Multi-Agent Team Factory & Plugin for the pi Coding Agent</title>
+<meta name="description" content="pi-agent-harness is a plugin/package for the pi coding agent that turns one domain sentence into a multi-agent team: specialist agents (.pi/agents), skills (.pi/skills), and orchestration prompts (.pi/prompts). A team-architecture factory with 6 patterns and a bundled subagent (single/parallel/chain) delegation tool.">
+<meta name="keywords" content="pi agent harness, pi-agent-harness, pi harness, pi plugin, pi package, pi coding agent, subagent, multi-agent team, agent team, orchestration, meta-skill, harness factory, pi.dev">
+<meta name="author" content="baryonlabs">
+<link rel="canonical" href="https://baryonlabs.github.io/pi-agent-harness/">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="pi-agent-harness">
+<meta property="og:title" content="pi-agent-harness — Multi-Agent Team Factory & Plugin for the pi Coding Agent">
+<meta property="og:description" content="Turn one domain sentence into a multi-agent team for the pi coding agent: specialist agents, their skills, and orchestration prompts. 6 team patterns + bundled subagent delegation.">
+<meta property="og:url" content="https://baryonlabs.github.io/pi-agent-harness/">
+<meta property="og:image" content="https://raw.githubusercontent.com/baryonlabs/pi-agent-harness/main/harness_social.png">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="pi-agent-harness — Multi-Agent Team Factory for the pi Coding Agent">
+<meta name="twitter:description" content="A pi plugin that turns one domain sentence into a multi-agent team: agents, skills, and orchestration prompts. 6 patterns + subagent (single/parallel/chain) delegation.">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/baryonlabs/pi-agent-harness/main/harness_social.png">
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "pi-agent-harness",
+  "alternateName": ["pi agent harness", "pi harness", "pi harness plugin"],
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "macOS, Linux, Windows",
+  "description": "A plugin/package for the pi coding agent that turns one domain sentence into a multi-agent team: specialist agents (.pi/agents), skills (.pi/skills), and orchestration prompts (.pi/prompts). A team-architecture factory with 6 patterns and a bundled subagent (single/parallel/chain) delegation tool.",
+  "url": "https://baryonlabs.github.io/pi-agent-harness/",
+  "downloadUrl": "https://github.com/baryonlabs/pi-agent-harness",
+  "codeRepository": "https://github.com/baryonlabs/pi-agent-harness",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "keywords": "pi, pi coding agent, pi plugin, pi package, harness, subagent, multi-agent team, orchestration",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "baryonlabs", "url": "https://github.com/baryonlabs" }
+}
+</script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -192,12 +231,12 @@ footer .links{display:flex;gap:2rem;justify-content:center;margin-bottom:1rem}
 <!-- ── Hero ── -->
 <section class="hero">
   <div class="hero-inner">
-    <div class="badge" data-i18n="hero.badge">Claude Code Plugin</div>
-    <h1 data-i18n="hero.title" data-i18n-html="true">Build <span>Agent Teams</span><br>That Actually Work</h1>
-    <p data-i18n="hero.desc">Harness is a meta-skill that designs domain-specific agent teams, defines specialized agents, and generates the skills they use &mdash; all from a single prompt.</p>
+    <div class="badge" data-i18n="hero.badge">pi Coding Agent · Plugin</div>
+    <h1 data-i18n="hero.title" data-i18n-html="true">Build <span>Agent Teams</span><br>for the pi Coding Agent</h1>
+    <p data-i18n="hero.desc">pi-agent-harness is a plugin for the pi coding agent that turns one domain sentence into a multi-agent team &mdash; specialist agents, their skills, and orchestration prompts. Not a single-agent profile manager: it designs and orchestrates whole teams.</p>
     <div class="hero-actions">
       <a href="#install" class="btn btn-primary" data-i18n="hero.btn_start">Get Started</a>
-      <a href="https://github.com/revfactory/harness" class="btn btn-outline" target="_blank">
+      <a href="https://github.com/baryonlabs/pi-agent-harness" class="btn btn-outline" target="_blank">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
         <span data-i18n="hero.btn_github">GitHub</span>
       </a>
@@ -266,7 +305,7 @@ footer .links{display:flex;gap:2rem;justify-content:center;margin-bottom:1rem}
 <section id="usecases">
   <div class="container">
     <h2 class="reveal" data-i18n="usecases.title">Try These Prompts</h2>
-    <p class="reveal" data-i18n="usecases.desc">Copy any prompt into Claude Code after installing Harness. Click to expand.</p>
+    <p class="reveal" data-i18n="usecases.desc">Copy any prompt into pi after installing pi-agent-harness. Click to expand.</p>
     <div class="usecases-grid reveal">
       <div class="usecase-card" data-active="false">
         <div class="uc-icon">&#128270;</div>
@@ -519,17 +558,17 @@ footer .links{display:flex;gap:2rem;justify-content:center;margin-bottom:1rem}
     <p class="reveal" style="margin:0 auto 2rem" data-i18n="install.desc" data-i18n-html="true">Two commands. That&rsquo;s it.</p>
     <div class="reveal">
       <div style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.5rem">
-        <span class="step-num">1</span><span style="font-size:.9rem;color:var(--text-dim)" data-i18n="install.step1">Add the marketplace</span>
+        <span class="step-num">1</span><span style="font-size:.9rem;color:var(--text-dim)" data-i18n="install.step1">Install the pi package</span>
       </div>
       <div class="code-block" onclick="copyCode(this)">
-        <span class="prompt">&gt; </span><span class="cmd">/plugin marketplace add revfactory/harness</span>
+        <span class="prompt">$ </span><span class="cmd">pi install git:github.com/baryonlabs/pi-agent-harness</span>
         <button class="copy-btn" data-i18n="install.copy_btn">Copy</button>
       </div>
       <div style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin:1.5rem 0 .5rem">
-        <span class="step-num">2</span><span style="font-size:.9rem;color:var(--text-dim)" data-i18n="install.step2">Install the plugin</span>
+        <span class="step-num">2</span><span style="font-size:.9rem;color:var(--text-dim)" data-i18n="install.step2">Start pi and trigger the harness</span>
       </div>
       <div class="code-block" onclick="copyCode(this)">
-        <span class="prompt">&gt; </span><span class="cmd">/plugin install harness@harness</span>
+        <span class="prompt">&gt; </span><span class="cmd">build a harness for this project</span>
         <button class="copy-btn" data-i18n="install.copy_btn">Copy</button>
       </div>
       <p style="margin:2rem auto 0;font-size:.9rem" data-i18n="install.hint" data-i18n-html="true">Then just say: <strong style="color:var(--accent2)">&ldquo;Build a harness for this project&rdquo;</strong></p>
@@ -554,19 +593,19 @@ footer .links{display:flex;gap:2rem;justify-content:center;margin-bottom:1rem}
 // ── i18n Translation System ──
 const i18n = {
   "hero.badge": {
-    "en": "Claude Code Plugin",
-    "ko": "Claude Code \ud50c\ub7ec\uadf8\uc778",
-    "ja": "Claude Code \u30d7\u30e9\u30b0\u30a4\u30f3"
+    "en": "pi Coding Agent \u00b7 Plugin",
+    "ko": "pi \ucf54\ub529 \uc5d0\uc774\uc804\ud2b8 \u00b7 \ud50c\ub7ec\uadf8\uc778",
+    "ja": "pi \u30b3\u30fc\u30c7\u30a3\u30f3\u30b0\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8 \u00b7 \u30d7\u30e9\u30b0\u30a4\u30f3"
   },
   "hero.title": {
-    "en": "Build <span>Agent Teams</span><br>That Actually Work",
-    "ko": "\uc9c4\uc9dc \uc791\ub3d9\ud558\ub294 <span>\uc5d0\uc774\uc804\ud2b8 \ud300</span>\uc744<br>\uad6c\ucd95\ud558\uc138\uc694",
-    "ja": "\u672c\u5f53\u306b\u6a5f\u80fd\u3059\u308b<span>\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u30c1\u30fc\u30e0</span>\u3092<br>\u69cb\u7bc9\u3057\u3088\u3046"
+    "en": "Build <span>Agent Teams</span><br>for the pi Coding Agent",
+    "ko": "pi \ucf54\ub529 \uc5d0\uc774\uc804\ud2b8\ub97c \uc704\ud55c<br><span>\uc5d0\uc774\uc804\ud2b8 \ud300</span>\uc744 \uad6c\ucd95\ud558\uc138\uc694",
+    "ja": "pi \u30b3\u30fc\u30c7\u30a3\u30f3\u30b0\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u306e\u305f\u3081\u306e<br><span>\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u30c1\u30fc\u30e0</span>\u3092\u69cb\u7bc9"
   },
   "hero.desc": {
-    "en": "Harness is a meta-skill that designs domain-specific agent teams, defines specialized agents, and generates the skills they use \u2014 all from a single prompt.",
-    "ko": "Harness\ub294 \ub3c4\uba54\uc778\uc5d0 \ub9de\ub294 \uc5d0\uc774\uc804\ud2b8 \ud300\uc744 \uc124\uacc4\ud558\uace0, \uc804\ubb38 \uc5d0\uc774\uc804\ud2b8\ub97c \uc815\uc758\ud558\uba70, \uc5d0\uc774\uc804\ud2b8\uac00 \uc0ac\uc6a9\ud560 \uc2a4\ud0ac\uc744 \uc0dd\uc131\ud558\ub294 \uba54\ud0c0 \uc2a4\ud0ac\uc785\ub2c8\ub2e4 \u2014 \ub2e8 \ud558\ub098\uc758 \ud504\ub86c\ud504\ud2b8\ub85c.",
-    "ja": "Harness\u306f\u30c9\u30e1\u30a4\u30f3\u7279\u5316\u306e\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u30c1\u30fc\u30e0\u3092\u8a2d\u8a08\u3057\u3001\u5c02\u9580\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u3092\u5b9a\u7fa9\u3057\u3001\u5f7c\u3089\u304c\u4f7f\u3046\u30b9\u30ad\u30eb\u3092\u751f\u6210\u3059\u308b\u30e1\u30bf\u30b9\u30ad\u30eb\u3067\u3059 \u2014 \u305f\u3063\u305f\u4e00\u3064\u306e\u30d7\u30ed\u30f3\u30d7\u30c8\u3067\u3002"
+    "en": "pi-agent-harness is a plugin for the pi coding agent that turns one domain sentence into a multi-agent team \u2014 specialist agents, their skills, and orchestration prompts. Not a single-agent profile manager: it designs and orchestrates whole teams.",
+    "ko": "pi-agent-harness\ub294 pi \ucf54\ub529 \uc5d0\uc774\uc804\ud2b8\uc6a9 \ud50c\ub7ec\uadf8\uc778\uc73c\ub85c, \ub3c4\uba54\uc778 \ud55c \ubb38\uc7a5\uc744 \uba40\ud2f0\uc5d0\uc774\uc804\ud2b8 \ud300\uc73c\ub85c \ubc14\uafc9\ub2c8\ub2e4 \u2014 \uc804\ubb38 \uc5d0\uc774\uc804\ud2b8, \uadf8\ub4e4\uc758 \uc2a4\ud0ac, \uc624\ucf00\uc2a4\ud2b8\ub808\uc774\uc158 \ud504\ub86c\ud504\ud2b8. \ub2e8\uc77c \uc5d0\uc774\uc804\ud2b8 \ud504\ub85c\ud544 \uad00\ub9ac\uac00 \uc544\ub2c8\ub77c, \ud300 \uc804\uccb4\ub97c \uc124\uacc4\u00b7\uc870\uc728\ud569\ub2c8\ub2e4.",
+    "ja": "pi-agent-harness\u306fpi\u30b3\u30fc\u30c7\u30a3\u30f3\u30b0\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u5411\u3051\u30d7\u30e9\u30b0\u30a4\u30f3\u3067\u3001\u30c9\u30e1\u30a4\u30f3\u4e00\u6587\u3092\u30de\u30eb\u30c1\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u30c1\u30fc\u30e0\u306b\u5909\u63db\u3057\u307e\u3059 \u2014 \u5c02\u9580\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u3001\u30b9\u30ad\u30eb\u3001\u30aa\u30fc\u30b1\u30b9\u30c8\u30ec\u30fc\u30b7\u30e7\u30f3\u30d7\u30ed\u30f3\u30d7\u30c8\u3002\u5358\u4e00\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u306e\u30d7\u30ed\u30d5\u30a1\u30a4\u30eb\u7ba1\u7406\u3067\u306f\u306a\u304f\u3001\u30c1\u30fc\u30e0\u5168\u4f53\u3092\u8a2d\u8a08\u30fb\u7d71\u5236\u3057\u307e\u3059\u3002"
   },
   "hero.btn_start": {
     "en": "Get Started",
@@ -654,9 +693,9 @@ const i18n = {
     "ja": "\u3053\u306e\u30d7\u30ed\u30f3\u30d7\u30c8\u3092\u8a66\u3057\u3066\u307f\u3088\u3046"
   },
   "usecases.desc": {
-    "en": "Copy any prompt into Claude Code after installing Harness. Click to expand.",
-    "ko": "Harness \uc124\uce58 \ud6c4 \uc544\ubb34 \ud504\ub86c\ud504\ud2b8\ub098 Claude Code\uc5d0 \ubcf5\uc0ac\ud574\uc11c \uc0ac\uc6a9\ud558\uc138\uc694. \ud074\ub9ad\ud558\uc5ec \ud3bc\uce58\uae30.",
-    "ja": "Harness\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb\u5f8c\u3001\u4efb\u610f\u306e\u30d7\u30ed\u30f3\u30d7\u30c8\u3092Claude Code\u306b\u30b3\u30d4\u30fc\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u30af\u30ea\u30c3\u30af\u3067\u5c55\u958b\u3002"
+    "en": "Copy any prompt into pi after installing pi-agent-harness. Click to expand.",
+    "ko": "pi-agent-harness \uc124\uce58 \ud6c4 \uc544\ubb34 \ud504\ub86c\ud504\ud2b8\ub098 pi\uc5d0 \ubcf5\uc0ac\ud574\uc11c \uc0ac\uc6a9\ud558\uc138\uc694. \ud074\ub9ad\ud558\uc5ec \ud3bc\uce58\uae30.",
+    "ja": "pi-agent-harness\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb\u5f8c\u3001\u4efb\u610f\u306e\u30d7\u30ed\u30f3\u30d7\u30c8\u3092pi\u306b\u30b3\u30d4\u30fc\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u30af\u30ea\u30c3\u30af\u3067\u5c55\u958b\u3002"
   },
   "usecases.research.title": {
     "en": "Deep Research",
@@ -1064,19 +1103,19 @@ const i18n = {
     "ja": "\u6570\u79d2\u3067\u59cb\u3081\u3089\u308c\u307e\u3059"
   },
   "install.desc": {
-    "en": "Two commands. That\u2019s it.",
-    "ko": "\uba85\ub839\uc5b4 \ub450 \uc904\uc774\uba74 \ub05d.",
-    "ja": "\u30b3\u30de\u30f3\u30c92\u3064\u3060\u3051\u3002\u305d\u308c\u3060\u3051\u3067\u3059\u3002"
+    "en": "One install. That\u2019s it.",
+    "ko": "\uc124\uce58 \ud55c \ubc88\uc774\uba74 \ub05d.",
+    "ja": "\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb1\u56de\u3060\u3051\u3002\u305d\u308c\u3060\u3051\u3067\u3059\u3002"
   },
   "install.step1": {
-    "en": "Add the marketplace",
-    "ko": "\ub9c8\ucf13\ud50c\ub808\uc774\uc2a4 \ucd94\uac00",
-    "ja": "\u30de\u30fc\u30b1\u30c3\u30c8\u30d7\u30ec\u30a4\u30b9\u3092\u8ffd\u52a0"
+    "en": "Install the pi package",
+    "ko": "pi \ud328\ud0a4\uc9c0 \uc124\uce58",
+    "ja": "pi \u30d1\u30c3\u30b1\u30fc\u30b8\u3092\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb"
   },
   "install.step2": {
-    "en": "Install the plugin",
-    "ko": "\ud50c\ub7ec\uadf8\uc778 \uc124\uce58",
-    "ja": "\u30d7\u30e9\u30b0\u30a4\u30f3\u3092\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb"
+    "en": "Start pi and trigger the harness",
+    "ko": "pi \uc2e4\ud589 \ud6c4 \ud558\ub124\uc2a4 \ud2b8\ub9ac\uac70",
+    "ja": "pi \u3092\u8d77\u52d5\u3057\u3066\u30cf\u30fc\u30cd\u30b9\u3092\u30c8\u30ea\u30ac\u30fc"
   },
   "install.hint": {
     "en": "Then just say: <strong style=\"color:var(--accent2)\">&ldquo;Build a harness for this project&rdquo;</strong>",

@@ -223,6 +223,24 @@ The original Claude Code harness was validated in a controlled A/B study and shi
 **A.** Yes. pi can load skills from other harnesses by adding their directories to `settings.json` (e.g. `"skills": ["~/.claude/skills"]`). Agent Skills standard SKILL.md files are largely portable between Claude Code and pi.
 </details>
 
+<details>
+<summary><b>Q4. How is this different from <code>pi-harness-factory</code>?</b></summary>
+
+**A.** They solve different problems and are complementary.
+
+- **[`pi-harness-factory`](https://github.com/kswift1/pi-harness-factory)** is a **single-agent profile manager**: it defines "working modes" (presets like `tdd`, `safe-coder`, `code-reviewer`, `researcher`) that constrain *one* agent's tool access, mutation scope, validation strictness, and safety gates. It answers **"what is this one agent allowed to do, and how strict should it be?"** — a *runtime-configuration* factory (guardrails).
+- **`pi-agent-harness`** (this project) is a **multi-agent team factory**: from one domain sentence it generates a *team* of specialist agents (`.pi/agents/`), their skills (`.pi/skills/`), and orchestration prompts (`.pi/prompts/`) that fan out and chain work via the bundled `subagent` tool. It answers **"how do I decompose this domain into a coordinated team of agents?"** — a *team-architecture* factory.
+
+| | `pi-harness-factory` | `pi-agent-harness` (this) |
+|---|---|---|
+| Unit of work | One agent, many modes | Many agents, one team |
+| Produces | JSON profiles (`.pi/harness-factory/`) | Agents + skills + orchestration prompts (`.pi/`) |
+| Focus | Guardrails / constraints | Decomposition / orchestration |
+| Layer | Runtime-configuration factory | Team-architecture factory |
+
+You can use both: constrain each generated agent with `pi-harness-factory` modes while `pi-agent-harness` designs and orchestrates the team.
+</details>
+
 ## License
 
 Apache 2.0
