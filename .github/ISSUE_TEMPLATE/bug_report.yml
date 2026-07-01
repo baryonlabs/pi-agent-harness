@@ -15,22 +15,22 @@ body:
         **Triage SLA:** we aim to label new issues within 48h and respond substantively within 72h on business days (see [CONTRIBUTING.md](../../CONTRIBUTING.md)).
 
   - type: input
-    id: claude-code-version
+    id: pi-version
     attributes:
-      label: Claude Code version
-      description: Output of `claude --version` (e.g. `2.3.1`)
-      placeholder: "2.x.y"
+      label: pi version
+      description: Output of `pi --version` (e.g. `1.4.2`)
+      placeholder: "x.y.z"
     validations:
       required: true
 
   - type: dropdown
-    id: experimental-flag
+    id: subagent-extension
     attributes:
-      label: Experimental Agent Teams flag state
-      description: Is `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` set in the shell where you hit this bug?
+      label: subagent extension loaded?
+      description: Is the bundled `subagent` extension active? (check `/reload` / installed packages, or that `subagent` appears as a tool)
       options:
-        - "Yes, flag is set to 1"
-        - "No, flag is unset"
+        - "Yes, subagent tool is available"
+        - "No, subagent tool is missing"
         - "I don't know / N/A"
     validations:
       required: true
@@ -41,10 +41,9 @@ body:
       label: Reproduction steps
       description: Minimal steps to reproduce. Commands, config, and inputs please.
       placeholder: |
-        1. `claude plugin marketplace add harness@harness`
-        2. `export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
-        3. `claude "build a harness for ..."`
-        4. observe ...
+        1. `pi install git:github.com/baryonlabs/pi-agent-harness`
+        2. inside pi: `하네스 구성해줘 ...` (or `build a harness for ...`)
+        3. observe ...
     validations:
       required: true
 

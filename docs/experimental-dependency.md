@@ -1,153 +1,123 @@
-# Experimental Flag Dependency
+# Runtime Dependency (pi)
 
-> **Status:** Active · **Owner:** revfactory · **Last updated:** 2026-04-18 · **SLA:** See [Monitoring Commitment](#monitoring-commitment)
+> **Status:** Active · **Owner:** baryonlabs · **Last updated:** 2026-07-01 · **SLA:** See [Monitoring Commitment](#monitoring-commitment)
 
-This document explains why `harness` requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, the three plausible futures of that flag, and what this repository will do in each case — with time-boxed commitments so enterprise adopters can plan against it.
+This document explains what `pi-agent-harness` depends on at runtime, why there is **no experimental flag** (unlike the Claude Code original), and how this repository adapts when its upstream — the [pi coding agent](https://github.com/earendil-works/pi) — changes.
+
+> **Ported from Claude Code.** The original [Harness](https://github.com/revfactory/harness) depended on Claude Code's experimental Agent Teams API (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, `TeamCreate`/`SendMessage`/`TaskCreate`). This pi port removes that dependency entirely: pi has no built-in subagents, so multi-agent delegation is supplied by a **bundled `subagent` extension**. Nothing to enable, no preview flags.
 
 ---
 
 ## Current State
 
-### Why the flag is required
+### What the harness depends on
 
-`harness` is a meta-skill factory built on top of Claude Code's **Agent Teams API**. Three Claude Code primitives are invoked internally whenever a user runs `claude "build a harness for <domain>"`:
+| Dependency | Purpose | Gated? |
+|-----------|---------|--------|
+| **pi coding agent** | Host runtime; loads skills, prompts, extensions, context files | No — stable install |
+| **Bundled `subagent` extension** (`extensions/subagent/`) | Registers the `subagent` tool for `single`/`parallel`/`chain` delegation | No — ships in this package |
+| **pi extension API** (`@earendil-works/pi-coding-agent`, `pi-agent-core`, `pi-ai`, `pi-tui`, `typebox`) | The `subagent` extension imports these (declared as `peerDependencies`) | No — provided by pi at runtime |
+| **Agent Skills standard** | `.pi/skills/*/SKILL.md` format | No — versioned spec ([agentskills.io](https://agentskills.io/specification)) |
 
-| Primitive | Purpose | Flag gated? |
-|-----------|---------|-------------|
-| `TeamCreate` | Instantiates a multi-agent team with shared context | **Yes** |
-| `SendMessage` | Routes messages between team members (supervisor ↔ worker) | **Yes** |
-| `TaskCreate` | Spawns long-running subtasks inside a team | **Yes** |
-| `Agent` tool (invoke) | Single-agent dispatch | No (GA) |
+There is **no environment variable to set**. After `pi install`, the `subagent` tool and `harness` skill load automatically.
 
-All three flag-gated primitives require:
+### The one caveat: pi's extension API is young
 
-```bash
-export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
-```
-
-Without this variable set in the shell that launches `claude`, harness's generated teams fall back to single-agent execution, which silently breaks the Pipeline / Fan-out-in / Supervisor / Hierarchical Delegation patterns.
-
-### Anthropic references (required reading before filing issues)
-
-The design rationale and roadmap for this flag live in three Anthropic Engineering posts. Adopters evaluating harness should read at least the first:
-
-1. [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) — defines the "harness" category Anthropic endorses and the long-running agent contract.
-2. [Harness design for long-running apps](https://www.anthropic.com/engineering/harness-design-long-running-apps) — the patterns `harness` codifies (Pipeline, Producer-Reviewer, Supervisor, etc.).
-3. [Scaling Managed Agents](https://www.anthropic.com/engineering/managed-agents) — the forward path that may supersede the Experimental flag (see Scenario B).
+pi is a fast-moving, minimal harness. The `subagent` extension imports internal symbols from `@earendil-works/pi-coding-agent` (e.g. `getAgentDir`, `parseFrontmatter`, `CONFIG_DIR_NAME`, `ExtensionAPI`). If pi renames or changes these, the extension can break even though generated `.pi/agents`/`.pi/skills` (plain Markdown) remain valid.
 
 ---
 
 ## Dependency Graph
 
 ```
-harness (v1.2.0)
-  └── Agent Teams API (Claude Code)
-        ├── TeamCreate            ← EXPERIMENTAL_AGENT_TEAMS=1
-        ├── SendMessage           ← EXPERIMENTAL_AGENT_TEAMS=1
-        ├── TaskCreate            ← EXPERIMENTAL_AGENT_TEAMS=1
-        └── Agent (invoke)        ← GA (flag-independent)
-              └── Anthropic Roadmap
-                    ├── Scenario A: Flag removed (GA promotion)
-                    ├── Scenario B: Managed Agents GA (parallel path)
-                    └── Scenario C: Breaking signature change
+pi-agent-harness (v2.0.0)
+  ├── harness skill (.pi/skills discovery)          ← Agent Skills standard
+  ├── generated .pi/agents · .pi/skills · .pi/prompts ← plain Markdown, runtime-independent
+  └── subagent extension (extensions/subagent)
+        └── pi extension API (peerDependencies)
+              └── pi release cadence
+                    ├── Scenario A: pi adds first-class subagents
+                    ├── Scenario B: pi extension API stabilizes / is versioned
+                    └── Scenario C: breaking API change (symbol rename/signature)
 ```
 
-**Read this graph top-down:** harness depends on Agent Teams API, which depends on a single Experimental flag, which depends on Anthropic's own roadmap. If any upstream node changes, this repository is on the hook to adapt within the SLA below.
+**Read top-down:** the durable output (agents/skills/prompts Markdown) does not depend on pi internals. Only the `subagent` extension does. If pi's extension API changes, this repository adapts within the SLA below.
 
 ---
 
-## 3 Scenarios
+## Scenarios
 
-Each scenario lists the **detection trigger** (how we will know it happened), the **T+24h / T+48h / T+72h actions** this repository commits to, and the **user-visible artifact** at each checkpoint.
+### Scenario A — pi ships first-class subagents
 
-### Scenario A — Flag removed (Agent Teams promoted to GA)
+**Trigger detection:** pi Changelog announces a built-in subagent/delegation tool, or an official pi package supersedes our bundled extension.
 
-**Trigger detection:** Anthropic Claude Code Changelog publishes "Agent Teams is now GA" **or** `claude-code` binary no longer requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (detected by nightly CI in [P-13](#).
-
-**Probability (subjective):** High — this is the path the three blog posts above telegraph.
+**Probability (subjective):** Medium. pi's philosophy is "we skip subagents; build or install your own," so a first-party version is plausible but not guaranteed.
 
 | Checkpoint | Action | Artifact |
 |------------|--------|----------|
-| **T+24h** | Open branch `feat/drop-experimental-flag`. Remove `export` line from every README / docs / Quickstart. Add `claude-code >= X.Y.Z` lower bound in `plugin.json`. | Branch + PR (draft) |
-| **T+48h** | Publish `docs/migrating-from-experimental.md`. Update `docs/experimental-dependency.md` (this file) headline to "no flag required as of vX.Y". Pin GitHub issue: "Action required: drop the export line". | Migration guide + pinned issue |
-| **T+72h** | Ship **v1.3.0** release with: (a) CHANGELOG entry, (b) `gh release create` with migration note, (c) HN follow-up: "We dropped the experimental flag". | `v1.3.0` git tag + GH Release |
+| **T+48h** | Open `feat/native-subagent` branch. Evaluate mapping our `single`/`parallel`/`chain` contract onto the native tool; keep the bundled extension as fallback. | Branch + PR (draft) |
+| **T+72h** | Update SKILL.md + references if the native tool changes the orchestration-prompt shape. Ship a minor release with a CHANGELOG note. | Minor release |
 
-**Adopter impact:** Positive. Enterprise approval friction drops — one checkbox ("no experimental flags") becomes satisfiable. No breaking change to harness user code.
+**Adopter impact:** Positive — one less bundled component to maintain. Generated harnesses keep working.
 
----
+### Scenario B — pi extension API is versioned/stabilized
 
-### Scenario B — Managed Agents reaches GA (parallel path)
-
-**Trigger detection:** Anthropic publishes "[Managed Agents](https://www.anthropic.com/engineering/managed-agents) is generally available" with a stable `claude-agents` CLI or SDK surface.
-
-**Probability (subjective):** Medium-high within 90 days. Managed Agents is a server-side execution model; harness's client-side team orchestration does **not** automatically translate.
+**Trigger detection:** pi publishes a stable, documented extension API surface (semver'd exports).
 
 | Checkpoint | Action | Artifact |
 |------------|--------|----------|
-| **T+24h** | Open `feat/managed-agents-compat` PR. Add `adapters/managed-agents/` scaffold that maps harness's 6 team patterns to Managed Agents invocation. Identify incompatible patterns (likely: Hierarchical Delegation). | Compat PR (draft) |
-| **T+48h** | Publish blog post: **"Harness + Managed Agents: one layer up, not replaced"** on Dev.to and in the repo. Re-frame harness as the **design-time** layer that outputs Managed Agents configs, not a runtime competitor. | Coexistence framing blog |
-| **T+72h** | Publish `docs/managed-agents-migration.md` with a per-pattern matrix (which of the 6 patterns map 1:1, which need rewrite). Update README sibling-repo section. | Migration guide |
+| **T+72h** | Pin `peerDependencies` to the stable range; document the minimum pi version in README Requirements. | Version-pinned release |
 
-**Strategic note:** harness re-positions as the **upper layer on top of Managed Agents** — "Managed Agents runs the team, harness designs it." This is the coexistence frame in §4.2 of the GTM plan.
+**Adopter impact:** Positive — fewer surprise breakages.
 
-**Adopter impact:** Neutral to positive. Existing harness users keep working on the Experimental flag path; new users can opt into Managed Agents output.
+### Scenario C — breaking change (symbol rename / signature change)
 
----
+**Trigger detection:** the `subagent` extension fails to load against pi's latest release, or an import throws.
 
-### Scenario C — Breaking change (API signature mutation)
-
-**Trigger detection:** Nightly CI (`.github/workflows/nightly-compat.yml`, tracked as roadmap P-13) fails against Claude Code's latest nightly build **or** the Changelog announces a renamed env var / changed `TeamCreate` signature.
-
-**Probability (subjective):** Medium. Experimental APIs are renamed without deprecation windows.
+**Probability (subjective):** Medium. Minimal fast-moving tools rename internals without deprecation windows.
 
 | Checkpoint | Action | Artifact |
 |------------|--------|----------|
-| **T+0 to T+24h** | Nightly CI alert fires in Slack/Discord. Author opens `hotfix/compat-<date>` branch, patches affected call sites. Unit tests green on both old + new signature (best effort). | Hotfix branch |
-| **T+24h** | Merge hotfix. Push `v1.2.x` patch tag. Update `docs/compatibility-matrix.md` row for affected Claude Code version. | `v1.2.x` patch release |
-| **T+72h** | If the change is non-trivial (affects harness's public contract), publish a short notice on the repo Discussions tab + X. Otherwise, CHANGELOG entry is sufficient. | Discussions post (conditional) |
+| **T+0–24h** | Open `hotfix/pi-compat-<date>`. Patch affected imports in `extensions/subagent/`. Verify the `subagent` tool registers and a sample delegation runs. | Hotfix branch |
+| **T+24h** | Merge hotfix, push a patch tag, note the affected pi version in the README Requirements. | Patch release |
 
-**Adopter impact:** Existing pinned users on the prior Claude Code version are unaffected. Users on latest get a same-week patch.
+**Adopter impact:** Users pinned to the prior pi version are unaffected; users on latest get a same-week patch.
 
 ---
 
 ## Monitoring Commitment
 
-We commit to the following **observable SLA**. Missing it is grounds for filing an issue with the `sla-breach` label.
-
 | Event | SLA | Measurement |
 |-------|-----|-------------|
-| Anthropic publishes Agent Teams / Managed Agents change in official Changelog | This document updated within **72 hours** | Compare Changelog post timestamp to this file's `Last updated` line |
-| Nightly CI detects compat break | Hotfix branch open within **24 hours** | GitHub Actions run timestamp vs. branch creation timestamp |
-| New Claude Code stable release (minor or major) | `docs/compatibility-matrix.md` row added within **7 days** | Compatibility matrix diff |
+| pi publishes a subagent/extension-API change in its Changelog | This document updated within **72 hours** | Changelog timestamp vs. this file's `Last updated` line |
+| `subagent` extension fails to load against latest pi | Hotfix branch open within **24 hours** | Report/CI timestamp vs. branch creation |
+| New pi minor/major release | README Requirements min-version row reviewed within **7 days** | Release timestamp vs. README diff |
 
-**Sources we actively monitor:**
+**Sources we monitor:**
 
-- Claude Code release notes — watched via the [Anthropic Engineering blog](https://www.anthropic.com/engineering) RSS
-- `anthropics/claude-code` GitHub Releases (nightly tag)
-- Anthropic Discord `#claude-code` channel (community signal)
+- pi releases — [earendil-works/pi](https://github.com/earendil-works/pi) GitHub Releases / CHANGELOG
+- `@earendil-works/pi-coding-agent` on npm (peer API surface)
+- pi [Discord](https://discord.com/invite/3cU7Bz4UPx) community signal
 
 ---
 
-## FAQ for Enterprise Adopters
+## FAQ for Adopters
 
-### Q1. We're in a regulated industry (finance, healthcare, public sector) and can't enable `EXPERIMENTAL` flags in production. How do we adopt harness?
+### Q1. Is there any preview/experimental flag to enable, like the Claude Code version?
 
-**Cause:** Many compliance frameworks (SOC 2 Type II, ISO 27001, K-ISMS) disallow unstable / preview features in production.
-**Action:** Use harness **design-time only**: run it in a sandbox workstation to scaffold `.claude/agents/` and `.claude/skills/` files, then commit the generated artifacts into your production repo. Production Claude Code never needs the flag — only the flag-gated `TeamCreate` runtime does. The generated single-agent skills are GA-path compatible.
+**A.** No. The Claude Code original required `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. This pi port bundles the `subagent` extension, so delegation works out of the box after `pi install`.
 
-### Q2. If Agent Teams goes GA (Scenario A), will my existing harness-generated code break?
+### Q2. If the `subagent` extension breaks, do my generated harnesses break?
 
-**Cause:** GA promotion in Anthropic's Claude Code has historically been non-breaking for generated artifacts; the flag simply stops being required.
-**Action:** No action required for end users. Your `.claude/agents/*.md` and `.claude/skills/*` files are plain Markdown and remain valid. You will be able to `unset CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` on the day of GA. We will publish a migration note within 48 hours (see Scenario A).
+**A.** Your `.pi/agents/*.md`, `.pi/skills/*`, and `.pi/prompts/*.md` are plain Markdown and stay valid. Only the delegation runtime (the extension) would need a patch — see Scenario C. Single-agent skill usage keeps working regardless.
 
-### Q3. Do you guarantee an SLA in writing? What happens if you miss it?
+### Q3. Can I use project-local agents safely?
 
-**Cause:** Enterprises need a contractual or at-minimum observable commitment before approval.
-**Action:** The SLA table above is the **public commitment** and is enforced by: (a) a GitHub Action that comments on this file if its `Last updated` line is older than 72 hours after a detected Changelog event, (b) an `sla-breach` issue label adopters may apply, (c) a post-mortem obligation in `CONTRIBUTING.md` for any breach. This is not a paid SLA — it is a community commitment. For a paid SLA, contact the maintainer (see repository README).
+**A.** The `subagent` tool loads project-local `.pi/agents/*.md` only when invoked with `agentScope: "both"`/`"project"`, and it prompts for confirmation in interactive mode. Enable only for repositories you trust. See `extensions/subagent/README.md`.
 
 ---
 
 **Related documents:**
 - [`docs/quickstart.md`](./quickstart.md) — 5-minute install walkthrough
-- [`docs/show-hn-launch-kit.md`](./show-hn-launch-kit.md) — Public launch package
-- `docs/compatibility-matrix.md` *(pending P-13)* — Claude Code × harness version table
+- [`extensions/subagent/README.md`](../extensions/subagent/README.md) — the bundled delegation tool
+- [`skills/harness/references/agent-design-patterns.md`](../skills/harness/references/agent-design-patterns.md) — full Claude → pi mapping

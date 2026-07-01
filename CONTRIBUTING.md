@@ -1,6 +1,6 @@
-# Contributing to Harness
+# Contributing to pi-agent-harness
 
-Thanks for considering a contribution to **Harness** — a Claude Code meta-skill factory that designs agent teams and generates skills.
+Thanks for considering a contribution to **pi-agent-harness** — a [pi](https://github.com/earendil-works/pi) meta-skill factory that designs agent teams and generates skills, prompts, and the bundled `subagent` extension.
 
 This document covers: response SLAs, how to contribute, development setup, PR conventions, commit message rules, code of conduct, and maintainer list.
 
@@ -29,7 +29,7 @@ Different kinds of contributions go through different entry points. Pick the one
 ### Bug report
 
 - Open an issue using the **Bug report** form (`.github/ISSUE_TEMPLATE/bug_report.yml`).
-- Required: Claude Code version, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` flag state, reproduction steps, expected vs actual, OS.
+- Required: pi version, whether the `subagent` tool loaded, reproduction steps, expected vs actual, OS.
 - Small reproductions (< 30 lines) are ideal. If your repro needs a full project, link a public fork.
 
 ### Feature request
@@ -39,7 +39,7 @@ Different kinds of contributions go through different entry points. Pick the one
 
 ### Question
 
-- Open an issue using the **Question** form, **or** start a thread in [GitHub Discussions](https://github.com/revfactory/harness/discussions) if the matter is open-ended.
+- Open an issue using the **Question** form, **or** start a thread in [GitHub Discussions](https://github.com/baryonlabs/pi-agent-harness/discussions) if the matter is open-ended.
 
 ### Discussion (RFC-sized ideas)
 
@@ -62,41 +62,41 @@ Different kinds of contributions go through different entry points. Pick the one
 
 ### Prerequisites
 
-- Claude Code `v2.x` (Agent Teams API required)
-- Node.js `>= 18` (for local tooling used in CI)
+- [pi coding agent](https://github.com/earendil-works/pi) installed (`pi --version`)
+- A model provider authenticated in pi (`/login` or an API key)
+- Node.js `>= 18` (for local tooling used in CI, and for the bundled TypeScript extension)
 - Git
 
-### Environment flag
+### No experimental flags
 
-Harness currently requires Claude Code's experimental Agent Teams feature. Set the flag in your shell profile or per-session:
+Unlike the Claude Code original, this pi port has **no environment flag to set**. Multi-agent delegation is supplied by the bundled `subagent` extension (`extensions/subagent/`). The runtime dependency (pi + that extension) is documented in `docs/experimental-dependency.md`.
 
-```bash
-export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
-```
+### Local package link
 
-We track this dependency in `docs/experimental-dependency.md` (if Anthropic promotes the flag to stable, we update the README within 72h per the SLA above).
-
-### Local plugin link
-
-To test your changes in a local Claude Code session without publishing to the marketplace:
+To test your changes in a local pi session without publishing:
 
 ```bash
-# From your checkout
-claude plugin link ./harness
+# From your checkout — try for the current run only
+pi -e /absolute/path/to/pi-agent-harness
+
+# Or install from the local path (writes to settings)
+pi install /absolute/path/to/pi-agent-harness
 
 # Verify
-claude plugin list | grep harness
+pi list
 ```
 
-Unlink with `claude plugin unlink harness` when you're done.
+Remove with `pi remove /absolute/path/to/pi-agent-harness`. Edits to the extension can be hot-reloaded inside pi with `/reload`.
 
 ### Running the meta-skill
 
-```bash
-claude "build a harness for a fintech risk-assessment team"
+Inside pi:
+
+```
+build a harness for a fintech risk-assessment team
 ```
 
-Scaffolded agents and skills land under `.claude/agents/` and `.claude/skills/` in the target project.
+Scaffolded agents, skills, and orchestration prompts land under `.pi/agents/`, `.pi/skills/`, and `.pi/prompts/` in the target project.
 
 ### Tests & lints
 
@@ -117,7 +117,7 @@ Use the `type/short-description` shape:
 | Prefix | Use for | Example |
 |--------|---------|---------|
 | `feat/` | New user-visible capability | `feat/expert-pool-variance-mode` |
-| `fix/` | Bug fix | `fix/agent-teams-flag-detection` |
+| `fix/` | Bug fix | `fix/subagent-agentscope-default` |
 | `docs/` | Docs-only changes | `docs/quickstart-gemini-section` |
 | `refactor/` | Internal structure, no behavior change | `refactor/skill-loader-split` |
 | `chore/` | Build, deps, housekeeping | `chore/upgrade-markdownlint` |
@@ -164,7 +164,7 @@ We follow a light variant of **Conventional Commits** that maps directly to SemV
 |-------------|---------------|---------|
 | `feat!:` or `BREAKING CHANGE:` in footer | **major** (e.g. 1.x → 2.0) | `feat!: rename primary pattern "Supervisor" → "Orchestrator"` |
 | `feat:` | **minor** (e.g. 1.2 → 1.3) | `feat: add Producer-Reviewer variance metric` |
-| `fix:` | **patch** (e.g. 1.2.3 → 1.2.4) | `fix: correct flag detection on zsh` |
+| `fix:` | **patch** (e.g. 1.2.3 → 1.2.4) | `fix: default subagent agentScope to project` |
 | `docs:` / `chore:` / `refactor:` / `test:` | no release bump | `docs: clarify Gemini roadmap` |
 
 - Korean summaries are fine: `feat: 전문가 풀 패턴에 분산 지표 추가`.
