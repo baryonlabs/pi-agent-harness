@@ -1,15 +1,32 @@
 {
   "name": "pi-agent-harness",
   "version": "2.0.0",
-  "description": "The team-architecture factory for pi — a meta-skill that turns a domain description into a pi agent team (.pi/agents), the skills they use (.pi/skills), and orchestration prompt templates (.pi/prompts), with six pre-defined team-architecture patterns (Pipeline, Fan-out/Fan-in, Expert Pool, Producer-Reviewer, Supervisor, Hierarchical Delegation). pi용 팀 아키텍처 팩토리: 도메인 한 문장을 pi 에이전트 팀과 스킬·오케스트레이션 프롬프트로 변환하는 메타 스킬.",
+  "description": "Team-architecture factory for the pi coding agent — turns one domain sentence into a multi-agent team: specialist agents (.pi/agents), their skills (.pi/skills), and orchestration prompts (.pi/prompts), with six team patterns and a bundled subagent (single/parallel/chain) delegation tool. Unlike single-agent profile managers, this designs and orchestrates whole agent teams. pi용 팀 아키텍처 팩토리: 도메인 한 문장을 pi 에이전트 팀과 스킬·오케스트레이션 프롬프트로 변환하는 메타 스킬.",
   "author": "robin (https://github.com/revfactory)",
   "homepage": "https://github.com/baryonlabs/pi-agent-harness",
-  "repository": "https://github.com/baryonlabs/pi-agent-harness",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baryonlabs/pi-agent-harness.git"
+  },
+  "bugs": {
+    "url": "https://github.com/baryonlabs/pi-agent-harness/issues"
+  },
   "license": "Apache-2.0",
+  "files": [
+    "skills/",
+    "extensions/",
+    "README.md",
+    "README_KO.md",
+    "README_JA.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "keywords": [
     "pi-package",
     "pi",
     "pi-coding-agent",
+    "pi-agent",
+    "pi-plugin",
     "harness",
     "harness-factory",
     "team-architecture-factory",
@@ -20,6 +37,7 @@
     "orchestration",
     "agent-scaffolding",
     "multi-agent",
+    "agent-skills",
     "pipeline",
     "fan-out-fan-in",
     "expert-pool",
@@ -29,7 +47,8 @@
   ],
   "pi": {
     "extensions": ["./extensions/subagent/index.ts"],
-    "skills": ["./skills"]
+    "skills": ["./skills"],
+    "image": "https://raw.githubusercontent.com/baryonlabs/pi-agent-harness/main/harness_social.png"
   },
   "peerDependencies": {
     "@earendil-works/pi-ai": "*",
