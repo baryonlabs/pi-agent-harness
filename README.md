@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-1.2.0-brightgreen.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Version-2.0.0-brightgreen.svg" alt="Version">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"></a>
-  <img src="https://img.shields.io/badge/Claude_Code-Plugin-purple.svg" alt="Claude Code Plugin">
+  <img src="https://img.shields.io/badge/pi-Package-purple.svg" alt="pi Package">
   <img src="https://img.shields.io/badge/Patterns-6_Architectures-orange.svg" alt="6 Architecture Patterns">
-  <img src="https://img.shields.io/badge/Mode-Agent_Teams-green.svg" alt="Agent Teams">
+  <img src="https://img.shields.io/badge/Modes-single%20%7C%20parallel%20%7C%20chain-green.svg" alt="Delegation Modes">
   <a href="https://github.com/revfactory/harness/stargazers"><img src="https://img.shields.io/github/stars/revfactory/harness?style=social" alt="GitHub Stars"></a>
 </p>
 
@@ -17,98 +17,106 @@
   <a href="#"><img src="https://img.shields.io/badge/README-EN%20%7C%20KO%20%7C%20JA-lightgrey" alt="i18n"></a>
 </p>
 
-# Harness — The Team-Architecture Factory for Claude Code
+# pi-agent-harness — The Team-Architecture Factory for pi
 
 **English** | [한국어](README_KO.md) | [日本語](README_JA.md)
 
-> **Harness is a team-architecture factory for Claude Code.** Say **"build a harness for this project"** (English) or **"하네스 구성해줘"** (한국어) or **"ハーネスを構成して"** (日本語), and the plugin turns your domain description into an agent team and the skills they use — picked from six pre-defined team-architecture patterns.
+> **pi-agent-harness is a team-architecture factory for [pi](https://github.com/earendil-works/pi), the minimal terminal coding agent.** Say **"build a harness for this project"** (English) or **"하네스 구성해줘"** (한국어) or **"ハーネスを構成して"** (日本語), and it turns your domain description into pi agent definitions, the skills they use, and the orchestration prompts that drive them — picked from six pre-defined team-architecture patterns.
+
+> **Ported from Claude Code.** This package is a pi-only port of the original [Harness](https://github.com/revfactory/harness) (a Claude Code plugin). It maps the same factory onto pi's primitives — `.pi/agents/`, `.pi/skills/`, `.pi/prompts/`, and the bundled `subagent` extension — because pi deliberately ships **no built-in subagents, no MCP, no plan mode, no todos**.
 
 ## Overview
 
-Harness leverages Claude Code's agent team system to decompose complex tasks into coordinated teams of specialized agents. Say "build a harness for this project" and it automatically generates agent definitions (`.claude/agents/`) and skills (`.claude/skills/`) tailored to your domain.
+pi is intentionally minimal: it gives the model four tools (`read`, `write`, `edit`, `bash`) and everything else is added via skills, prompt templates, extensions, and packages. This harness leverages that extensibility to decompose complex tasks into coordinated specialist agents. Say "build a harness for this project" and it generates:
+
+- **Agent definitions** (`.pi/agents/*.md`) — specialist personas with `tools`/`model` frontmatter; each runs in an isolated `pi` process
+- **Skills** (`.pi/skills/*/SKILL.md`) — Agent Skills standard procedural knowledge
+- **Orchestration prompts** (`.pi/prompts/*.md`) — `/commands` that drive the `subagent` tool in `single` / `parallel` / `chain` modes
+
+The bundled **`subagent` extension** (`extensions/subagent/`) supplies the delegation tool pi lacks natively, so generated harnesses run out of the box.
 
 ## Category — Where Harness Sits
 
-Harness lives at the **L3 Meta-Factory** layer of the Claude Code ecosystem — the layer that generates other harnesses rather than being one. Inside L3, we pick a specific sub-layer: **Team-Architecture Factory**.
+Harness lives at the **L3 Meta-Factory** layer — the layer that generates other harnesses rather than being one. Inside L3, we pick a specific sub-layer: **Team-Architecture Factory**. This package targets the **pi runtime**.
 
-| Layer | What it does | Neighbors we coexist with |
-|-------|--------------|---------------------------|
-| **L3 — Meta-Factory / Team-Architecture Factory** (us) | Domain sentence → agent team + skills, via 6 pre-defined team patterns | — |
+| Layer | What it does | Neighbors |
+|-------|--------------|-----------|
+| **L3 — Meta-Factory / Team-Architecture Factory** (us) | Domain sentence → pi agent team + skills + orchestration prompts, via 6 team patterns | — |
 | L3 — Meta-Factory / Runtime-Configuration Factory | Deterministic, repeatable runtime configurations | [coleam00/Archon](https://github.com/coleam00/Archon) |
-| L3 — Meta-Factory / Codex Runtime Port | Same concept, Codex runtime | [SaehwanPark/meta-harness](https://github.com/SaehwanPark/meta-harness) |
-| L2 — Cross-Harness Workflow | Standardize skills/rules/hooks across multiple harnesses | [affaan-m/ECC](https://github.com/affaan-m/everything-claude-code) |
-
-> Archon generates deterministic runtime configurations. Harness generates team architectures (pipeline, fan-out/fan-in, expert pool, producer-reviewer, supervisor, hierarchical delegation) plus the skills agents use. Different sub-layers of the same L3. Pick Archon for runtime determinism, Harness for team architecture, or combine them.
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=revfactory%2Fharness&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=revfactory/harness&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=revfactory/harness&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=revfactory/harness&type=date&legend=top-left" />
- </picture>
-</a>
-
+| L3 — Meta-Factory / Claude Code original | Same concept, Claude Code runtime | [revfactory/harness](https://github.com/revfactory/harness) |
+| L2 — Cross-Harness Workflow | Standardize skills/rules/hooks across harnesses | [affaan-m/ECC](https://github.com/affaan-m/everything-claude-code) |
 
 ## Key Features
 
-- **Agent Team Design** — 6 architectural patterns: Pipeline, Fan-out/Fan-in, Expert Pool, Producer-Reviewer, Supervisor, and Hierarchical Delegation
-- **Skill Generation** — Auto-generates skills with Progressive Disclosure for efficient context management
-- **Orchestration** — Inter-agent data passing, error handling, and team coordination protocols
-- **Validation** — Trigger verification, dry-run testing, and with-skill vs without-skill comparison tests
-
+- **Agent Design** — 6 architectural patterns: Pipeline, Fan-out/Fan-in, Expert Pool, Producer-Reviewer, Supervisor, and Hierarchical Delegation — mapped to pi's `single`/`parallel`/`chain` delegation modes
+- **Skill Generation** — Auto-generates Agent-Skills-standard skills with Progressive Disclosure for efficient context management
+- **Orchestration** — `subagent`-tool prompts with `{previous}` chaining, `_workspace/` file handoff, and error handling
+- **Model Tiering** — Per-agent model selection (`claude-haiku-4-5` for recon, `claude-sonnet-4-5` for work, `claude-opus-4-7` for hard reasoning)
+- **Validation** — Trigger verification, dry-run testing, and with-skill vs without-skill comparison via the `subagent` tool
 
 ## Workflow
 
 ```
 Phase 1: Domain Analysis
     ↓
-Phase 2: Team Architecture Design (Agent Teams vs Subagents)
+Phase 2: Architecture Design (single / parallel / chain delegation)
     ↓
-Phase 3: Agent Definition Generation (.claude/agents/)
+Phase 3: Agent Definition Generation (.pi/agents/)
     ↓
-Phase 4: Skill Generation (.claude/skills/)
+Phase 4: Skill Generation (.pi/skills/)
     ↓
-Phase 5: Integration & Orchestration
+Phase 5: Orchestration Prompts (.pi/prompts/) + AGENTS.md pointer
     ↓
 Phase 6: Validation & Testing
+    ↓
+Phase 7: Harness Evolution (feedback-driven)
 ```
 
 ## Installation
 
-### Via Marketplace
+Install as a pi package (the bundled `subagent` extension and the `harness` skill load automatically):
 
-#### Add the marketplace
-```shell
-/plugin marketplace add revfactory/harness
+```bash
+# From git
+pi install git:github.com/revfactory/harness
+
+# Or a local checkout
+pi install /absolute/path/to/pi-agent-harness
+
+# Project-local install (shareable with your team via .pi/settings.json)
+pi install -l /absolute/path/to/pi-agent-harness
 ```
 
-#### Install the plugin
-```shell
-/plugin install harness@harness-marketplace
+Try it without installing:
+
+```bash
+pi -e /absolute/path/to/pi-agent-harness
 ```
 
-### Direct Installation as Global Skill
-
-```shell
-# Copy the skills directory to ~/.claude/skills/harness/
-cp -r skills/harness ~/.claude/skills/harness
-```
-
-## Plugin Structure
+Then, inside pi, trigger it:
 
 ```
-harness/
-├── .claude-plugin/
-│   └── plugin.json                 # Plugin manifest
+하네스 구성해줘
+Build a harness for this project
+```
+
+## Package Structure
+
+```
+pi-agent-harness/
+├── package.json                    # pi manifest (extensions + skills)
+├── extensions/
+│   └── subagent/                   # Bundled delegation tool (single/parallel/chain)
+│       ├── index.ts
+│       ├── agents.ts
+│       └── README.md
 ├── skills/
 │   └── harness/
-│       ├── SKILL.md                # Main skill definition (6-Phase workflow)
+│       ├── SKILL.md                # Main skill (7-Phase workflow)
 │       └── references/
-│           ├── agent-design-patterns.md   # 6 architectural patterns
-│           ├── orchestrator-template.md   # Team/subagent orchestrator templates
-│           ├── team-examples.md           # 5 real-world team configurations
+│           ├── agent-design-patterns.md   # 6 patterns + Claude→pi mapping
+│           ├── orchestrator-template.md   # Orchestration prompt templates
+│           ├── team-examples.md           # 5 real-world configurations
 │           ├── skill-writing-guide.md     # Skill authoring guide
 │           ├── skill-testing-guide.md     # Testing & evaluation methodology
 │           └── qa-agent-guide.md          # QA agent integration guide
@@ -117,184 +125,102 @@ harness/
 
 ## Usage
 
-Trigger in Claude Code with prompts like:
+### Delegation Modes
 
-```
-Build a harness for this project
-Design an agent team for this domain
-Set up a harness
-```
+pi has no built-in agent teams or live messaging. Collaboration is implemented by the main agent delegating via the bundled `subagent` tool and exchanging results through `_workspace/` files. The orchestration prompt must pass `agentScope: "both"` so project-level `.pi/agents/` are discovered.
 
-### Execution Modes
-
-| Mode | Description | Recommended For |
-|------|-------------|-----------------|
-| **Agent Teams** (default) | TeamCreate + SendMessage + TaskCreate | 2+ agents requiring collaboration |
-| **Subagents** | Direct Agent tool invocation | One-off tasks, no inter-agent communication needed |
+| Mode | Tool params | Use for |
+|------|-------------|---------|
+| **single** | `{ agent, task }` | One-off isolated task, expert-pool selection |
+| **parallel** | `{ tasks: [...] }` (≤8, 4 concurrent) | Fan-out/fan-in independent work; main integrates |
+| **chain** | `{ chain: [...] }` with `{previous}` | Sequential pipeline, producer-reviewer loops |
 
 <p align="center">
   <img src="harness_team.png" alt="Harness Agent Team" width="500">
 </p>
 
-### Architecture Patterns
+### Architecture Patterns → pi modes
 
-| Pattern | Description |
-|---------|-------------|
-| Pipeline | Sequential dependent tasks |
-| Fan-out/Fan-in | Parallel independent tasks |
-| Expert Pool | Context-dependent selective invocation |
-| Producer-Reviewer | Generation followed by quality review |
-| Supervisor | Central agent with dynamic task distribution |
-| Hierarchical Delegation | Top-down recursive delegation |
+| Pattern | pi mapping |
+|---------|------------|
+| Pipeline | `chain` |
+| Fan-out/Fan-in | `parallel` → main integrates |
+| Expert Pool | `single` (selective) |
+| Producer-Reviewer | `chain` (worker → reviewer → worker) |
+| Supervisor | main agent's dynamic `parallel` loop |
+| Hierarchical Delegation | 2-level delegation |
 
 ## Output
 
-Files generated by Harness:
+Files generated by Harness in your project:
 
 ```
 your-project/
-├── .claude/
-│   ├── agents/          # Agent definition files
+├── .pi/
+│   ├── agents/          # Agent definitions (name, description, tools, model)
 │   │   ├── analyst.md
 │   │   ├── builder.md
-│   │   └── qa.md
-│   └── skills/          # Skill files
-│       ├── analyze/
-│       │   └── SKILL.md
-│       └── build/
-│           ├── SKILL.md
-│           └── references/
+│   │   └── qa-inspector.md
+│   ├── skills/          # Skill files
+│   │   ├── analyze/
+│   │   │   └── SKILL.md
+│   │   └── build/
+│   │       ├── SKILL.md
+│   │       └── references/
+│   └── prompts/         # Orchestration prompts (/commands)
+│       └── build-feature.md
+└── AGENTS.md            # Harness pointer (trigger rule + change log)
 ```
 
 ## Use Cases — Try These Prompts
 
-Copy any prompt below into Claude Code after installing Harness:
+After installing, trigger any of these inside pi:
 
-**Deep Research**
-```
-Build a harness for deep research. I need an agent team that can investigate
-any topic from multiple angles — web search, academic sources, community
-sentiment — then cross-validate findings and produce a comprehensive report.
-```
+**Deep Research** — `Build a harness for deep research: parallel agents investigating a topic from official, media, and community angles, then the main agent cross-validates and writes a report.`
 
-**Website Development**
-```
-Build a harness for full-stack website development. The team should handle
-design, frontend (React/Next.js), backend (API), and QA testing in a
-coordinated pipeline from wireframe to deployment.
-```
+**Website Development** — `Build a harness for full-stack website development as a chain: design → frontend (React/Next.js) → backend API → QA testing.`
 
-**Webtoon / Comic Production**
-```
-Build a harness for webtoon episode production. I need agents for story
-writing, character design prompts, panel layout planning, and dialogue
-editing. They should review each other's work for style consistency.
-```
+**Code Review** — `Build a harness for comprehensive code review: parallel agents checking architecture, security, and performance, then merged into a single report.`
 
-**YouTube Content Planning**
-```
-Build a harness for YouTube content creation. The team should research
-trending topics, write scripts, optimize titles/tags for SEO, and plan
-thumbnail concepts — all coordinated by a supervisor agent.
-```
+**Webtoon Production** — `Build a harness for webtoon episodes: a producer-reviewer chain where an artist agent generates panels and a reviewer agent enforces style consistency.`
 
-**Code Review & Refactoring**
-```
-Build a harness for comprehensive code review. I want parallel agents
-checking architecture, security vulnerabilities, performance bottlenecks,
-and code style — then merging all findings into a single report.
-```
-
-**Technical Documentation**
-```
-Build a harness that generates API documentation from this codebase.
-Agents should analyze endpoints, write descriptions, generate usage
-examples, and review for completeness.
-```
-
-**Data Pipeline Design**
-```
-Build a harness for designing data pipelines. I need agents for schema
-design, ETL logic, data validation rules, and monitoring setup that
-delegate sub-tasks hierarchically.
-```
-
-**Marketing Campaign**
-```
-Build a harness for marketing campaign creation. The team should research
-the target market, write ad copy, design visual concepts, and set up
-A/B test plans with iterative quality review.
-```
-
-## Coexistence — Harness and Neighbors
-
-Harness is not alone in the Claude Code / agent-framework ecosystem. The following repos live in adjacent layers; each is described in a parallel "X is …, Harness is …" form so you can pick the one that fits your need or combine several.
-
-| Repo | Their position | Relationship to Harness |
-|------|----------------|-------------------------|
-| [coleam00/Archon](https://github.com/coleam00/Archon) | "harness builder" — deterministic, repeatable runtime configurations | **Same L3, neighbor sub-layer.** Archon is a Runtime-Configuration Factory, Harness is a Team-Architecture Factory. Pick Archon for runtime determinism, Harness for team architecture, or combine them. |
-| [SaehwanPark/meta-harness](https://github.com/SaehwanPark/meta-harness) | Codex port of the same concept | **Same L3, different runtime.** Use Harness on Claude Code, meta-harness on Codex. |
-| [affaan-m/ECC](https://github.com/affaan-m/everything-claude-code) | "Agent harness performance & workflow layer" (sits on top of existing harnesses) | **Different layer.** ECC is a standardization layer across harnesses; Harness is a factory that generates harnesses. Serial combination possible. |
-| [wshobson/agents](https://github.com/wshobson/agents) | Subagent / skill catalog (182 agents, 149 skills) | **Factory ↔ parts supply.** wshobson is a catalog to shop from; Harness designs the team. Absorb wshobson entries as parts inside a Harness-generated team. |
-| [LangGraph](https://langchain-ai.github.io/langgraph/) | State-graph orchestration, LLM-agnostic | **Different track.** LangGraph is for long-running, state-recoverable orchestration; Harness is for fast Claude-Code-native team design. |
-
-## Built with Harness
-
-### Harness 100
-
-**[revfactory/harness-100](https://github.com/revfactory/harness-100)** — 100 production-ready agent team harnesses across 10 domains, available in both English and Korean (200 packages total). Each harness ships with 4-5 specialist agents, an orchestrator skill, and domain-specific skills — all generated by this plugin. 1,808 markdown files covering content creation, software development, data/AI, business strategy, education, legal, health, and more.
-
-### Research: A/B Testing Harness Effectiveness
-
-**[revfactory/claude-code-harness](https://github.com/revfactory/claude-code-harness)** — A controlled experiment across 15 software engineering tasks measuring the impact of structured pre-configuration on LLM code agent output quality.
-
-| Metric | Without Harness | With Harness | Improvement |
-|--------|:-:|:-:|:-:|
-| Average Quality Score | 49.5 | 79.3 | **+60%** |
-| Win Rate | — | — | **100%** (15/15) |
-| Output Variance | — | — | **-32%** |
-
-Key finding: effectiveness scales with task complexity — the harder the task, the greater the improvement (+23.8 Basic, +29.6 Advanced, +36.2 Expert).
-
-**Exact phrasing to use everywhere:** +60% avg quality (49.5 → 79.3), 15/15 win-rate, −32% variance (n=15, author-measured A/B, third-party replications pending).
-
-> Full paper: *Hwang, M. (2026). Harness: Structured Pre-Configuration for Enhancing LLM Code Agent Output Quality.*
+**Marketing Campaign** — `Build a harness for marketing campaigns: research the market, write ad copy, design visual concepts, and plan A/B tests with iterative review.`
 
 ## Requirements
 
-- [Agent Teams enabled](https://code.claude.com/docs/en/agent-teams): `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+- [pi coding agent](https://github.com/earendil-works/pi) installed (`npm install -g --ignore-scripts @earendil-works/pi-coding-agent`)
+- A model provider authenticated in pi (`/login` or an API key such as `ANTHROPIC_API_KEY`)
+- The bundled `subagent` extension (installed automatically with this package) — no extra setup
+
+> **Security note:** the `subagent` tool runs project-local agents (`.pi/agents/*.md`) only when invoked with `agentScope: "both"`/`"project"`, and prompts for confirmation in interactive mode. Only enable for repositories you trust. See `extensions/subagent/README.md`.
+
+## Built with Harness (Claude Code original)
+
+The original Claude Code harness was validated in a controlled A/B study and shipped a large catalog. Those artifacts target Claude Code; the methodology carries over to this pi port.
+
+- **[revfactory/harness-100](https://github.com/revfactory/harness-100)** — 100 production-ready agent team harnesses across 10 domains (EN + KO).
+- **[revfactory/claude-code-harness](https://github.com/revfactory/claude-code-harness)** — A/B experiment (n=15): +60% avg quality (49.5 → 79.3), 15/15 win-rate, −32% variance (author-measured, third-party replications pending).
+
+> Full paper: *Hwang, M. (2026). Harness: Structured Pre-Configuration for Enhancing LLM Code Agent Output Quality.*
 
 ## FAQ
 
 <details>
-<summary><b>Q1. Isn't "+60%" oversold?</b></summary>
+<summary><b>Q1. How is this different from the original Harness?</b></summary>
 
-**A.** The +60% figure comes from an **author-measured A/B (n=15, 15 tasks, measured on the sister repo `claude-code-harness`)**. Every citation in this repo pairs the number with the disclosure "n=15, author-measured, third-party replications pending" in the same sentence. For adoption decisions, we recommend running a 2–4 week internal pilot and measuring your own numbers.
-
-**Evidence:**
-- Author A/B: [revfactory/claude-code-harness](https://github.com/revfactory/claude-code-harness)
-- Paper: *Hwang, M. (2026). Harness: Structured Pre-Configuration for Enhancing LLM Code Agent Output Quality*
+**A.** Same factory, different runtime. The original [revfactory/harness](https://github.com/revfactory/harness) is a Claude Code plugin that generates `.claude/agents/` + `.claude/skills/` and relies on Claude Code's native agent teams (`TeamCreate`/`SendMessage`/`TaskCreate`). This package is a **pi-only port**: it generates `.pi/agents/` + `.pi/skills/` + `.pi/prompts/` and implements collaboration through the bundled `subagent` extension (`single`/`parallel`/`chain`) plus `_workspace/` file handoff, because pi has no built-in subagents or live team messaging.
 </details>
 
 <details>
-<summary><b>Q2. Why "harness factory" and not "harness builder"? Isn't this competing with Archon?</b></summary>
+<summary><b>Q2. pi has no subagents — how do agent teams work?</b></summary>
 
-**A.** Archon generates deterministic runtime configurations — it's a **Runtime-Configuration Factory**. Harness generates agent team architectures (team structure, message protocols, review gates) — it's a **Team-Architecture Factory**. They are **neighbor sub-layers of the same L3 Meta-Factory** and serve different needs. Pick Archon for runtime determinism, Harness for team-architecture patterns, or combine them (design architecture with Harness → deploy runtime with Archon).
-
-**Evidence:**
-- Archon self-definition: [clawfit docs/reference-levels.md](https://github.com/hongsw/clawfit/blob/main/docs/reference-levels.md)
-- Sub-layer declaration: see the **Category — Where Harness Sits** section above
-- Archon repo: [github.com/coleam00/Archon](https://github.com/coleam00/Archon)
+**A.** This package bundles a `subagent` extension that spawns a separate `pi` process per delegation, each with an isolated context window. The main agent acts as coordinator: it fans out with `parallel`, chains dependent steps with `chain` (passing `{previous}`), and integrates results itself (pi has no team-consensus channel). See `skills/harness/references/agent-design-patterns.md` for the full Claude→pi mapping.
 </details>
 
 <details>
-<summary><b>Q3. Isn't "Claude Code only" too narrow? What about Gemini/Codex?</b></summary>
+<summary><b>Q3. Can I reuse my existing Claude Code skills?</b></summary>
 
-**A.** Currently the official runtime is Claude Code only. A Codex port of the same concept — [SaehwanPark/meta-harness](https://github.com/SaehwanPark/meta-harness) — is already public, so Codex teams can start there. Harness chose "Claude-Code-native, deep" over "multi-runtime, shallow"; cross-runtime collaboration with sibling repos (meta-harness, harness-init, OpenRig) is on the roadmap.
-
-**Evidence:**
-- Codex port: [github.com/SaehwanPark/meta-harness](https://github.com/SaehwanPark/meta-harness)
-- Cross-runtime scaffolder: [github.com/Gizele1/harness-init](https://github.com/Gizele1/harness-init)
+**A.** Yes. pi can load skills from other harnesses by adding their directories to `settings.json` (e.g. `"skills": ["~/.claude/skills"]`). Agent Skills standard SKILL.md files are largely portable between Claude Code and pi.
 </details>
 
 ## License

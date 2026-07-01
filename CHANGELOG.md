@@ -16,6 +16,29 @@
 
 ---
 
+## [2.0.0] - 2026-06-30
+
+### Changed — **pi 전용 포팅 (BREAKING)**
+
+Claude Code 전용 하네스를 [pi 코딩 에이전트](https://github.com/earendil-works/pi) 전용으로 포팅. 동일한 팀 아키텍처 팩토리를 pi 프리미티브에 매핑.
+
+- **산출물 경로 변경**: `.claude/agents/` → `.pi/agents/`, `.claude/skills/` → `.pi/skills/`, 오케스트레이터 스킬 → 오케스트레이션 프롬프트 `.pi/prompts/`
+- **실행 모델 변경**: pi엔 빌트인 서브에이전트·실시간 팀 메시징이 없으므로 `TeamCreate`/`SendMessage`/`TaskCreate` → 번들된 `subagent` 확장의 `single`/`parallel`/`chain` 위임 + `_workspace/` 파일 핸드오프. 메인 에이전트가 통합·조정자 역할.
+- **에이전트 타입 모델 변경**: 빌트인 타입(`general-purpose`/`Explore`/`Plan`) 없음 → `tools` 화이트리스트로 권한 제어
+- **모델 티어링**: `model: "opus"` 고정 → 작업 난도별 `claude-haiku-4-5`/`claude-sonnet-4-5`/`claude-opus-4-7`
+- **컨텍스트 파일**: `CLAUDE.md` 포인터 → `AGENTS.md` 포인터
+- SKILL.md 및 references 6개 전면 재작성, README pi 타깃으로 갱신
+
+### Added
+- **`extensions/subagent/` 번들** — pi의 위임 도구(single/parallel/chain). 설치 시 자동 로드되어 생성된 하네스가 추가 설치 없이 동작
+- **`package.json`** — pi 패키지 매니페스트(`pi.extensions`, `pi.skills`) + `pi-package` 키워드
+- `references/agent-design-patterns.md`에 "Claude Code → pi 매핑 요약" 표
+
+### Removed
+- **`.claude-plugin/`** (marketplace.json, plugin.json) — Claude Code 전용 매니페스트 제거
+
+---
+
 ## [1.2.1] - 2026-04-18
 
 ### Fixed

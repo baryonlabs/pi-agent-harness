@@ -1,0 +1,41 @@
+{
+  "name": "pi-agent-harness",
+  "version": "2.0.0",
+  "description": "The team-architecture factory for pi — a meta-skill that turns a domain description into a pi agent team (.pi/agents), the skills they use (.pi/skills), and orchestration prompt templates (.pi/prompts), with six pre-defined team-architecture patterns (Pipeline, Fan-out/Fan-in, Expert Pool, Producer-Reviewer, Supervisor, Hierarchical Delegation). pi용 팀 아키텍처 팩토리: 도메인 한 문장을 pi 에이전트 팀과 스킬·오케스트레이션 프롬프트로 변환하는 메타 스킬.",
+  "author": "robin (https://github.com/revfactory)",
+  "homepage": "https://github.com/revfactory/harness",
+  "repository": "https://github.com/revfactory/harness",
+  "license": "Apache-2.0",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-coding-agent",
+    "harness",
+    "harness-factory",
+    "team-architecture-factory",
+    "agent-team",
+    "subagent",
+    "skill-architect",
+    "meta-skill",
+    "orchestration",
+    "agent-scaffolding",
+    "multi-agent",
+    "pipeline",
+    "fan-out-fan-in",
+    "expert-pool",
+    "producer-reviewer",
+    "supervisor",
+    "hierarchical-delegation"
+  ],
+  "pi": {
+    "extensions": ["./extensions/subagent/index.ts"],
+    "skills": ["./skills"]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-agent-core": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*",
+    "typebox": "*"
+  }
+}
