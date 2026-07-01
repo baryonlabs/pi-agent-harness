@@ -3,3 +3,7 @@
 .pi/
 node_modules/
 _workspace/
+
+# Keep example harnesses' .pi/ directories (they are the demo artifacts)
+!examples/**/.pi/
+!examples/**/.pi/**
