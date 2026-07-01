@@ -1,6 +1,6 @@
 {
   "name": "@baryonlabs/pi-agent-harness",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "publishConfig": {
     "access": "public"
   },
@@ -49,8 +49,12 @@
     "hierarchical-delegation"
   ],
   "pi": {
-    "extensions": ["./extensions/subagent/index.ts"],
-    "skills": ["./skills"],
+    "extensions": [
+      "./extensions/subagent/index.ts"
+    ],
+    "skills": [
+      "./skills"
+    ],
     "image": "https://raw.githubusercontent.com/baryonlabs/pi-agent-harness/main/harness_social.png"
   },
   "peerDependencies": {

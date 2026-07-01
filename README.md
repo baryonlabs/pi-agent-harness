@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-2.0.0-brightgreen.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Version-2.1.0-brightgreen.svg" alt="Version">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"></a>
   <img src="https://img.shields.io/badge/pi-Package-purple.svg" alt="pi Package">
   <img src="https://img.shields.io/badge/Patterns-6_Architectures-orange.svg" alt="6 Architecture Patterns">
@@ -53,6 +53,17 @@ Harness lives at the **L3 Meta-Factory** layer — the layer that generates othe
 - **Orchestration** — `subagent`-tool prompts with `{previous}` chaining, `_workspace/` file handoff, and error handling
 - **Model Tiering** — Per-agent model selection (`claude-haiku-4-5` for recon, `claude-sonnet-4-5` for work, `claude-opus-4-7` for hard reasoning)
 - **Validation** — Trigger verification, dry-run testing, and with-skill vs without-skill comparison via the `subagent` tool
+
+## Why this vs other pi harnesses
+
+The pi.dev gallery has 40+ "harness" packages. Most are **single-agent guardrail/workflow tools for software coding only**. pi-agent-harness is positioned differently (full landscape in [`docs/competitive-analysis.md`](docs/competitive-analysis.md)):
+
+- **Zero companion dependencies.** Multi-agent harnesses like `skynex-pi` require 4 extra packages to install alongside. We **bundle** the `subagent` delegation tool — `pi install` and go.
+- **Domain-agnostic, not code-only.** Every direct competitor targets software engineering. This factory builds teams for **any** domain — research, novels, webtoons, marketing, *and* code.
+- **A team-architecture factory, not a profile manager.** vs `pi-harness-factory` (single-agent modes) and governance-only harnesses: we *decompose a domain into a coordinated team* with 6 named patterns.
+- **Lean surface.** vs `ultimate-pi`'s 20+ commands: one orchestration prompt per domain, generated to fit.
+
+We also **adopt** what works across the ecosystem: complexity triage (scale process to task size), a structured inter-agent handoff schema, run manifests (artifacts-as-truth), a verification gate + bounded repair loop, HITL checkpoints, and no-auto-commit governance.
 
 ## Workflow
 
