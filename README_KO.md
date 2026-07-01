@@ -78,6 +78,9 @@ pi 패키지로 설치하면 번들된 `subagent` 확장과 `harness` 스킬이 
 
 ```bash
 # git에서
+pi install npm:@baryonlabs/pi-agent-harness
+
+# git
 pi install git:github.com/baryonlabs/pi-agent-harness
 
 # 또는 로컬 체크아웃

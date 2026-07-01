@@ -77,14 +77,17 @@ Phase 7: Harness Evolution (feedback-driven)
 Install as a pi package (the bundled `subagent` extension and the `harness` skill load automatically):
 
 ```bash
-# From git
-pi install git:github.com/revfactory/harness
+# From npm (pi.dev gallery)
+pi install npm:@baryonlabs/pi-agent-harness
+
+# Or from git
+pi install git:github.com/baryonlabs/pi-agent-harness
 
 # Or a local checkout
 pi install /absolute/path/to/pi-agent-harness
 
 # Project-local install (shareable with your team via .pi/settings.json)
-pi install -l /absolute/path/to/pi-agent-harness
+pi install -l npm:@baryonlabs/pi-agent-harness
 ```
 
 Try it without installing:

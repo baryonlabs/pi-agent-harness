@@ -1,6 +1,9 @@
 {
-  "name": "pi-agent-harness",
+  "name": "@baryonlabs/pi-agent-harness",
   "version": "2.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Team-architecture factory for the pi coding agent — turns one domain sentence into a multi-agent team: specialist agents (.pi/agents), their skills (.pi/skills), and orchestration prompts (.pi/prompts), with six team patterns and a bundled subagent (single/parallel/chain) delegation tool. Unlike single-agent profile managers, this designs and orchestrates whole agent teams. pi용 팀 아키텍처 팩토리: 도메인 한 문장을 pi 에이전트 팀과 스킬·오케스트레이션 프롬프트로 변환하는 메타 스킬.",
   "author": "robin (https://github.com/revfactory)",
   "homepage": "https://github.com/baryonlabs/pi-agent-harness",
