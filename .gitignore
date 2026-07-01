@@ -1,2 +1,5 @@
 .DS_Store
 .claude/
+.pi/
+node_modules/
+_workspace/
