@@ -12,6 +12,7 @@ description: "pi(코딩 에이전트)용 하네스를 구성한다. 도메인을
 2. **subagent 도구 오케스트레이션을 기본 실행 모드로 사용한다.** — pi에는 빌트인 서브에이전트·실시간 팀 메시징이 없으므로, 번들된 `subagent` 확장의 single/parallel/chain 모드와 `_workspace/` 파일 핸드오프로 협업을 구현한다.
 3. **AGENTS.md에 하네스 포인터를 등록한다.** — 새 세션에서 오케스트레이션 프롬프트가 트리거되도록 최소한의 포인터(트리거 규칙 + 변경 이력)만 기록한다.
 4. **하네스는 고정물이 아니라 진화하는 시스템이다.** — 매 실행 후 피드백을 반영하고, 에이전트·스킬·프롬프트·AGENTS.md를 지속 갱신한다.
+5. **프로세스를 작업 크기에 맞추고, 사람이 통제권을 쥔다.** — 요청을 복잡도로 트리아지하여 필요한 만큼만 위임하고(간단한 요청에 팀을 띄우지 않는다), 커밋·PR·머지·배포 등 되돌리기 어려운 행동은 명시적 요청 없이 하지 않는다. 상세 패턴(트리아지·구조화된 핸드오프·검증 게이트·바운디드 리페어·HITL)은 `references/orchestrator-template.md`의 "채용 패턴" + `references/agent-design-patterns.md`의 "구조화된 핸드오프 스키마" 참조.
 
 > **pi ≠ Claude Code.** pi는 의도적으로 미니멀하다: 빌트인 서브에이전트·MCP·플랜모드·투두·백그라운드 bash가 없다. 모든 확장은 skills/prompt templates/extensions/packages로 구현한다. 따라서 "에이전트 팀"은 실시간 메시징 팀이 아니라 **별도 pi 프로세스를 스폰하는 subagent 오케스트레이션**으로 매핑된다. 자세한 매핑은 `references/agent-design-patterns.md` 참조.
 

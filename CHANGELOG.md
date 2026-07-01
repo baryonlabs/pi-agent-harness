@@ -16,6 +16,25 @@
 
 ---
 
+## [2.1.0] - 2026-07-01
+
+### Added — 경쟁 분석 기반 개선 + 발견성
+
+- **`docs/competitive-analysis.md`** — pi.dev `harness` 생태계(40+ 패키지) 경쟁 분석. zob-harness/skynex-pi/ultimate-pi/gentle-pi/dev-loops 심층 비교, 차용 항목, 차별점 정리
+- **채용 패턴** (`references/orchestrator-template.md`): 복잡도 트리아지(작업 크기에 프로세스 매칭), 런 매니페스트(아티팩트=진실), 검증 게이트 + 바운디드 리페어(≤2회, 스코프 확대 금지), HITL 체크포인트
+- **구조화된 핸드오프 스키마** (`references/agent-design-patterns.md`): CONTEXT/OUTPUT/EVIDENCE/OPEN/NEXT — 실시간 메시징 부재를 파일로 보완
+- **no-auto-commit 원칙** (SKILL.md 핵심 원칙 5): 커밋·PR·머지·배포는 명시적 요청 없이 하지 않음
+- **README "Why this vs other pi harnesses"**: zero-deps, 도메인 무관, 팀 아키텍처 팩토리 차별점
+- **npm/pi.dev 갤러리 등재**: `@baryonlabs/pi-agent-harness` (스코프 공개 게시)
+
+### SEO / 발견성
+
+- GitHub repo description/topics(15)/homepage 갱신, GitHub Pages 배포(https://baryonlabs.github.io/pi-agent-harness/)
+- index.html SEO(title·meta·canonical·OG·Twitter·JSON-LD), robots.txt·sitemap.xml
+- README FAQ Q4: pi-harness-factory와의 차별화
+
+---
+
 ## [2.0.0] - 2026-06-30
 
 ### Changed — **pi 전용 포팅 (BREAKING)**

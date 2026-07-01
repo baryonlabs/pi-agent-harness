@@ -179,3 +179,61 @@ description: "{도메인} 워크플로우 실행. {키워드}. 후속 작업 키
 
 팬아웃/팬인 기본 구조: Phase 0(컨텍스트 확인) → parallel 수집 → 메인 read+통합 → 정리.
 `references/team-examples.md`의 리서치 팀 예시를 참조.
+
+---
+
+## 채용 패턴 (경쟁 분석 기반)
+
+pi.dev 생태계의 성공한 하네스(zob-harness, skynex-pi, ultimate-pi)에서 검증된 패턴을 우리 위임 모델에 맞게 채용한다. 배경은 `docs/competitive-analysis.md` 참조.
+
+### 1. 복잡도 트리아지 (프로세스를 작업 크기에 맞춘다)
+
+모든 워크플로우를 무겁게 돌리지 않는다. 오케스트레이션 프롬프트 시작에서 요청을 분류하고, 그에 맞는 위임 깊이만 실행한다:
+
+| 등급 | 판단 기준 | 실행 |
+|------|----------|------|
+| **conversational** | 단순 질문·설명 | 위임 없음. 메인이 직접 응답 |
+| **small** | 단일 파일/사소한 수정 | single 위임 1회 또는 메인 직접 |
+| **standard** | 신규 기능·다중 파일 | parallel 수집 → 통합 → chain 검증 |
+| **substantial** | 아키텍처·보안·마이그레이션 | 트리아지 → 계획 → parallel 구현 → 검증 게이트 → 리페어 |
+
+프롬프트에 명시: `먼저 요청 복잡도를 conversational/small/standard/substantial로 분류하고, 그 등급의 위임만 실행하라. 확신이 없으면 한 단계 낮춰 시작하고 필요 시 승격한다.`
+
+### 2. 런 매니페스트 (아티팩트가 진실이다)
+
+각 실행에 런 ID를 부여하고 `_workspace/<run_id>/`에 산출물을 모은다. 시작 시 `manifest.md`를 써서 채팅이 사라져도 상태가 남게 한다:
+
+```markdown
+# Run: <run_id>
+- 입력: "$@"
+- 복잡도: standard
+- 팀: [scout, planner, worker, reviewer]
+- 단계: [x] 수집  [ ] 통합  [ ] 검증
+- 산출물: _workspace/<run_id>/{01_scout.md, 02_plan.md, ...}
+```
+
+run_id는 사용자 입력이 필요 없도록 도메인+순번(예: `research-01`)으로 메인이 생성한다.
+
+### 3. 검증 게이트 & 바운디드 리페어 (증거 기반 생성-검증)
+
+생성-검증을 강화한다. reviewer는 "느낌"이 아니라 **증거**로 판정하고, 리페어는 **승인된 범위를 넓히지 않으며**, 횟수를 고정한다:
+
+```
+chain: [
+  { agent: "worker",   task: "계획을 구현: {previous}. 변경 파일·검증 방법을 산출물에 명시" },
+  { agent: "reviewer", task: "다음 결과를 증거 기반으로 검증. 이슈는 파일:라인+재현으로. PASS/FAIL+사유: {previous}" },
+  { agent: "worker",   task: "FAIL 이슈만 수정(범위 확대 금지): {previous}" }
+]
+```
+
+- reviewer 산출물은 `_workspace/<run_id>/review.md`에 PASS/FAIL 항목으로 기록
+- 리페어는 **최대 2회**. 2회 후에도 FAIL이면 미해결 항목을 보고서에 명시하고 사용자 판단에 넘긴다
+- 리페어 task는 "FAIL 항목만" 수정하도록 못박아 스코프 크리프를 막는다
+
+### 4. HITL 체크포인트 & no-auto-commit
+
+substantial 등급이나 되돌리기 어려운 작업에서는 **사람 승인 지점**을 명시한다:
+
+- 계획 승인: 구현 전 계획(`_workspace/<run_id>/plan.md`)을 사용자에게 보여주고 승인받는다
+- **자동 커밋·머지·배포 금지**: 하네스는 명시적 요청 없이 커밋/PR/머지/배포하지 않는다. 최종 산출물만 제시하고, 커밋 여부는 사용자가 결정한다 (zob "no-ship review", ultimate "never auto-merges" 채용)
+- HITL 강도는 작업 위험도에 비례: 읽기·분석은 게이트 없이, 파일 변경·외부 전송은 게이트 필수
