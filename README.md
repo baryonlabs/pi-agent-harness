@@ -186,6 +186,17 @@ your-project/
 └── AGENTS.md            # Harness pointer (trigger rule + change log)
 ```
 
+## Examples
+
+A runnable, generated harness lives in [`examples/`](examples/):
+
+- **[`repo-audit/`](examples/repo-audit/)** — audits any codebase from architecture, security, and quality angles (parallel fan-out), then integrates and adversarially verifies into one prioritized `AUDIT.md`. Runs with **zero companion dependencies** — just pi + this package. Read it to see exactly what the factory produces (`.pi/agents/`, `.pi/prompts/`, structured handoff, model tiering, run manifest, no-auto-commit).
+
+```bash
+cd examples/repo-audit && pi
+# then: /repo-audit .
+```
+
 ## Use Cases — Try These Prompts
 
 After installing, trigger any of these inside pi:
