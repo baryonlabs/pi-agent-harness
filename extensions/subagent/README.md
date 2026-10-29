@@ -17,39 +17,22 @@ Delegate tasks to specialized subagents with isolated context windows.
 subagent/
 ├── README.md            # This file
 ├── index.ts             # The extension (entry point)
-├── agents.ts            # Agent discovery logic
-├── agents/              # Sample agent definitions
-│   ├── scout.md         # Fast recon, returns compressed context
-│   ├── planner.md       # Creates implementation plans
-│   ├── reviewer.md      # Code review
-│   └── worker.md        # General-purpose (full capabilities)
-└── prompts/             # Workflow presets (prompt templates)
-    ├── implement.md     # scout -> planner -> worker
-    ├── scout-and-plan.md    # scout -> planner (no implementation)
-    └── implement-and-review.md  # worker -> reviewer -> worker
+└── agents.ts            # Agent discovery logic
 ```
+
+Sample agent definitions and workflow prompts live in `examples/repo-audit/` (project-level
+`.pi/agents/` and `.pi/prompts/`).
 
 ## Installation
 
-From the repository root, symlink the files:
+The extension ships with this package and is loaded automatically when the package is
+installed. To use it standalone, symlink the two source files into the agent extension
+directory (the extension must live in a subdirectory that contains `index.ts`):
 
 ```bash
-# Symlink the extension (must be in a subdirectory with index.ts)
 mkdir -p ~/.pi/agent/extensions/subagent
-ln -sf "$(pwd)/packages/coding-agent/examples/extensions/subagent/index.ts" ~/.pi/agent/extensions/subagent/index.ts
-ln -sf "$(pwd)/packages/coding-agent/examples/extensions/subagent/agents.ts" ~/.pi/agent/extensions/subagent/agents.ts
-
-# Symlink agents
-mkdir -p ~/.pi/agent/agents
-for f in packages/coding-agent/examples/extensions/subagent/agents/*.md; do
-  ln -sf "$(pwd)/$f" ~/.pi/agent/agents/$(basename "$f")
-done
-
-# Symlink workflow prompts
-mkdir -p ~/.pi/agent/prompts
-for f in packages/coding-agent/examples/extensions/subagent/prompts/*.md; do
-  ln -sf "$(pwd)/$f" ~/.pi/agent/prompts/$(basename "$f")
-done
+ln -sf "$(pwd)/extensions/subagent/index.ts" ~/.pi/agent/extensions/subagent/index.ts
+ln -sf "$(pwd)/extensions/subagent/agents.ts" ~/.pi/agent/extensions/subagent/agents.ts
 ```
 
 ## Security Model
@@ -142,6 +125,21 @@ System prompt for the agent goes here.
 - `.pi/agents/*.md` - Project-level (only with `agentScope: "project"` or `"both"`)
 
 Project agents override user agents with the same name when `agentScope: "both"`.
+
+**Discovery is per working directory.** Each task's `cwd` (falling back to the session cwd)
+is used to resolve the agent, so a project that ships its own `.pi/agents/` can be delegated
+into from a different session directory:
+
+```
+subagent({ agent: "quality-scout", task: "...", agentScope: "both", cwd: "/path/to/project" })
+```
+
+The project agents directory is searched upward from that cwd (nearest `.pi/agents/` wins).
+
+**Writing reports.** An agent that must persist a report file needs `write` in its `tools`
+whitelist — with a read-only whitelist it can only return text, and the report has to travel
+back through the parent's context (50 KB cap per task). Keep `edit` out of the whitelist and
+scope `write` to the report path in the agent's system prompt.
 
 ## Sample Agents
 

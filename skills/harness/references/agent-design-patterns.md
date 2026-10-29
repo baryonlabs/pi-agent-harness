@@ -176,11 +176,13 @@ pi엔 실시간 메시징이 없으므로 파일 핸드오프가 조율의 전�
 ---
 name: agent-name
 description: 이 에이전트가 무엇을 하는지 (subagent 도구가 위임 대상 선택 시 참조)
-tools: read, grep, find, ls
+tools: read, grep, find, ls, write
 model: claude-sonnet-4-5
 ---
 
 당신은 [도메인]의 [역할] 전문가입니다.
+
+> `write`는 지정된 산출물 파일에만 쓴다. 소스 파일은 절대 고치지 않는다.
 
 ## 핵심 역할
 1. 역할1
@@ -224,6 +226,7 @@ pi엔 `Explore`/`Plan` 같은 읽기 전용 빌트인 타입이 없다. 대신 `
 |------|-----------|------|
 | 읽기 전용 분석/리뷰 | `read, grep, find, ls` | 파일 수정 불가 (Explore 대체) |
 | 읽기 전용 + git 조회 | `read, grep, find, ls, bash` | bash는 본문에서 read-only 명령(`git diff` 등)만 지시 (reviewer/QA) |
+| 리포트 파일을 남기는 분석가 | `read, grep, find, ls, write` | 지정된 산출물 파일만 작성 가능. `edit`를 빼서 수정 권한은 차단 (fan-out 파일 핸드오프에 필수) |
 | 계획 수립 | `read, grep, find, ls` | 코드 변경 없이 설계 (Plan 대체) |
 | 구현(파일 수정) | 생략 또는 `read, write, edit, bash, grep, find, ls` | 전체 도구 |
 

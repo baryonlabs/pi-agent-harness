@@ -6,11 +6,14 @@ A team that audits a codebase from three independent angles, integrates the find
 
 | Agent | model | tools | role |
 |-------|-------|-------|------|
-| `architecture-scout` | claude-sonnet-4-5 | read, grep, find, ls | module boundaries, coupling, layering |
-| `security-scout` | claude-sonnet-4-5 | read, grep, find, ls, bash | injection, secrets, authz gaps (read-only bash) |
-| `quality-scout` | claude-haiku-4-5 | read, grep, find, ls | dead code, duplication, naming, test gaps |
-| `audit-synthesizer` | claude-opus-4-7 | read, grep, find, ls | integrate the three reports into one prioritized audit |
-| `skeptic` | claude-sonnet-4-5 | read, grep, find, ls | verify each finding against the code; drop the unsupported |
+| `architecture-scout` | claude-sonnet-4-5 | read, grep, find, ls, write | module boundaries, coupling, layering |
+| `security-scout` | claude-sonnet-4-5 | read, grep, find, ls, bash, write | injection, secrets, authz gaps (read-only bash) |
+| `quality-scout` | claude-haiku-4-5 | read, grep, find, ls, write | dead code, duplication, naming, test gaps |
+| `audit-synthesizer` | claude-opus-4-7 | read, grep, find, ls, write | integrate the three reports into one prioritized audit |
+| `skeptic` | claude-sonnet-4-5 | read, grep, find, ls, write | verify each finding against the code; drop the unsupported |
+
+`write` is scoped to each agent's own report file; `edit` is excluded so no agent can modify
+the code it is reviewing.
 
 ## Pattern
 

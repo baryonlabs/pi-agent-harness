@@ -113,12 +113,13 @@ model: claude-sonnet-4-5
 ```
 
 - **tools:** 공백/쉼표 구분 화이트리스트. 생략하면 기본 도구(read/write/edit/bash) 전체. 읽기 전용 분석가는 `read, grep, find, ls`로 제한하여 실수로 파일을 수정하지 못하게 한다 (pi엔 `Explore` 빌트인 타입이 없으므로 도구 화이트리스트로 동일 효과를 낸다).
+  - **리포트를 파일로 남겨야 하는 에이전트에는 `write`를 넣고 `edit`는 뺀다.** 본문에 "지정된 산출물 파일에만 쓰고 소스 파일은 건드리지 않는다"를 명시한다. `write` 없이 파일 산출물을 요구하면 에이전트는 쓰지 못한 채 요약만 돌려주므로, fan-out 결과가 메인 컨텍스트(50KB 캡)를 통과해야 한다 — 파일 핸드오프가 무의미해진다. 반대로 `edit`까지 주면 "리포트 쓰기" 권한이 "코드 수정" 권한으로 번진다.
 - **model:** 추론 난도에 맞춰 티어링한다. 정찰/추출=`claude-haiku-4-5`, 일반 구현/리뷰=`claude-sonnet-4-5`, 고난도 설계/통합=`claude-opus-4-7`.
 
 > 정의 템플릿과 실제 파일 전문은 `references/agent-design-patterns.md`의 "에이전트 정의 구조" + `references/team-examples.md` 참조.
 
 **QA 에이전트 포함 시 필수 사항:**
-- QA 에이전트는 `tools`에 `read, grep, find, ls, bash`를 부여한다 (패턴 검색·교차 대조에 필요). 읽기 전용으로 두되 bash는 read-only 명령만 쓰도록 본문에 명시
+- QA 에이전트는 `tools`에 `read, grep, find, ls, bash, write`를 부여한다 (패턴 검색·교차 대조 + 검증 리포트 저장에 필요). `edit`는 제외해 소스 수정 권한은 막고, `write`는 지정된 리포트 파일에만 쓰도록 본문에 명시. bash는 read-only 명령만 쓰도록 명시
 - QA의 핵심은 "존재 확인"이 아니라 **"경계면 교차 비교"** — API 응답과 프론트 훅을 동시에 읽고 shape을 비교
 - QA는 전체 완성 후 1회가 아니라, **각 모듈 완성 직후 점진적으로 실행** (incremental QA)
 - 상세 가이드: `references/qa-agent-guide.md` 참조

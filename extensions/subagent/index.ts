@@ -28,7 +28,7 @@ import {
 } from "@earendil-works/pi-coding-agent";
 import { Container, Markdown, Spacer, Text } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
-import { type AgentConfig, type AgentScope, discoverAgents } from "./agents.ts";
+import { type AgentConfig, type AgentDiscoveryResult, type AgentScope, discoverAgents } from "./agents.ts";
 
 const MAX_PARALLEL_TASKS = 8;
 const MAX_CONCURRENCY = 4;
@@ -158,6 +158,8 @@ interface SingleResult {
 	stopReason?: string;
 	errorMessage?: string;
 	step?: number;
+	/** Directory the agent was discovered in (project agents only). */
+	projectAgentsDir?: string | null;
 }
 
 interface SubagentDetails {
@@ -264,9 +266,61 @@ function getPiInvocation(args: string[]): { command: string; args: string[] } {
 
 type OnUpdateCallback = (partial: AgentToolResult<SubagentDetails>) => void;
 
+/**
+ * Resolve the agent for a task against the working directory that task will actually run in.
+ *
+ * Discovery used to be computed once from the session cwd, so delegating with a different
+ * `cwd` (e.g. into a project that ships its own `.pi/agents/`) failed with
+ * "Unknown agent ... Available agents: none" even though the agent file existed.
+ */
+function resolveAgent(
+	agentScope: AgentScope,
+	cwd: string,
+	agentName: string,
+): { agent: AgentConfig | undefined; discovery: AgentDiscoveryResult } {
+	const discovery = discoverAgents(cwd, agentScope);
+	return { agent: discovery.agents.find((a) => a.name === agentName), discovery };
+}
+
+/** All agents reachable from the session cwd and any per-task cwd. */
+function collectAvailableAgents(
+	agentScope: AgentScope,
+	ctxCwd: string,
+	taskCwds: (string | undefined)[],
+): AgentConfig[] {
+	const cwds = [ctxCwd, ...taskCwds.filter((c): c is string => Boolean(c))];
+	const merged = new Map<string, AgentConfig>();
+	for (const cwd of [...new Set(cwds)]) {
+		for (const agent of discoverAgents(cwd, agentScope).agents) {
+			const existing = merged.get(agent.name);
+			if (!existing || (existing.source === "user" && agent.source === "project")) {
+				merged.set(agent.name, agent);
+			}
+		}
+	}
+	return [...merged.values()];
+}
+
+/** Project-local agents among the requested ones, resolved per task cwd. */
+function resolveRequestedProjectAgents(
+	agentScope: AgentScope,
+	ctxCwd: string,
+	requests: { name: string; cwd?: string }[],
+): AgentConfig[] {
+	const found = new Map<string, AgentConfig>();
+	for (const request of requests) {
+		const cwd = request.cwd ?? ctxCwd;
+		const { agent } = resolveAgent(agentScope, cwd, request.name);
+		if (agent && agent.source === "project" && !found.has(agent.name)) {
+			found.set(agent.name, agent);
+		}
+	}
+	return [...found.values()];
+}
+
 async function runSingleAgent(
 	defaultCwd: string,
-	agents: AgentConfig[],
+	agentScope: AgentScope,
 	agentName: string,
 	task: string,
 	cwd: string | undefined,
@@ -275,19 +329,21 @@ async function runSingleAgent(
 	onUpdate: OnUpdateCallback | undefined,
 	makeDetails: (results: SingleResult[]) => SubagentDetails,
 ): Promise<SingleResult> {
-	const agent = agents.find((a) => a.name === agentName);
+	const effectiveCwd = cwd ?? defaultCwd;
+	const { agent, discovery } = resolveAgent(agentScope, effectiveCwd, agentName);
 
 	if (!agent) {
-		const available = agents.map((a) => `"${a.name}"`).join(", ") || "none";
+		const available = discovery.agents.map((a) => `"${a.name}"`).join(", ") || "none";
 		return {
 			agent: agentName,
 			agentSource: "unknown",
 			task,
 			exitCode: 1,
 			messages: [],
-			stderr: `Unknown agent: "${agentName}". Available agents: ${available}.`,
+			stderr: `Unknown agent: "${agentName}". Available agents: ${available}. Searched in: ${effectiveCwd}.`,
 			usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, cost: 0, contextTokens: 0, turns: 0 },
 			step,
+			projectAgentsDir: discovery.projectAgentsDir,
 		};
 	}
 
@@ -308,6 +364,7 @@ async function runSingleAgent(
 		usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, cost: 0, contextTokens: 0, turns: 0 },
 		model: agent.model,
 		step,
+		projectAgentsDir: discovery.projectAgentsDir,
 	};
 
 	const emitUpdate = () => {
@@ -472,7 +529,11 @@ export default function (pi: ExtensionAPI) {
 		async execute(_toolCallId, params, signal, onUpdate, ctx) {
 			const agentScope: AgentScope = params.agentScope ?? "user";
 			const discovery = discoverAgents(ctx.cwd, agentScope);
-			const agents = discovery.agents;
+			const availableAgents = collectAvailableAgents(agentScope, ctx.cwd, [
+				...(params.tasks?.map((t) => t.cwd) ?? []),
+				...(params.chain?.map((s) => s.cwd) ?? []),
+				params.cwd,
+			]);
 			const confirmProjectAgents = params.confirmProjectAgents ?? true;
 
 			const hasChain = (params.chain?.length ?? 0) > 0;
@@ -485,12 +546,13 @@ export default function (pi: ExtensionAPI) {
 				(results: SingleResult[]): SubagentDetails => ({
 					mode,
 					agentScope,
-					projectAgentsDir: discovery.projectAgentsDir,
+					projectAgentsDir:
+						results.find((r) => r.projectAgentsDir)?.projectAgentsDir ?? discovery.projectAgentsDir,
 					results,
 				});
 
 			if (modeCount !== 1) {
-				const available = agents.map((a) => `${a.name} (${a.source})`).join(", ") || "none";
+				const available = availableAgents.map((a) => `${a.name} (${a.source})`).join(", ") || "none";
 				return {
 					content: [
 						{
@@ -503,14 +565,12 @@ export default function (pi: ExtensionAPI) {
 			}
 
 			if ((agentScope === "project" || agentScope === "both") && confirmProjectAgents && ctx.hasUI) {
-				const requestedAgentNames = new Set<string>();
-				if (params.chain) for (const step of params.chain) requestedAgentNames.add(step.agent);
-				if (params.tasks) for (const t of params.tasks) requestedAgentNames.add(t.agent);
-				if (params.agent) requestedAgentNames.add(params.agent);
+				const requestedAgents: { name: string; cwd?: string }[] = [];
+				if (params.chain) for (const step of params.chain) requestedAgents.push({ name: step.agent, cwd: step.cwd });
+				if (params.tasks) for (const t of params.tasks) requestedAgents.push({ name: t.agent, cwd: t.cwd });
+				if (params.agent) requestedAgents.push({ name: params.agent, cwd: params.cwd });
 
-				const projectAgentsRequested = Array.from(requestedAgentNames)
-					.map((name) => agents.find((a) => a.name === name))
-					.filter((a): a is AgentConfig => a?.source === "project");
+				const projectAgentsRequested = resolveRequestedProjectAgents(agentScope, ctx.cwd, requestedAgents);
 
 				if (projectAgentsRequested.length > 0) {
 					const names = projectAgentsRequested.map((a) => a.name).join(", ");
@@ -552,7 +612,7 @@ export default function (pi: ExtensionAPI) {
 
 					const result = await runSingleAgent(
 						ctx.cwd,
-						agents,
+						agentScope,
 						step.agent,
 						taskWithContext,
 						step.cwd,
@@ -624,7 +684,7 @@ export default function (pi: ExtensionAPI) {
 				const results = await mapWithConcurrencyLimit(params.tasks, MAX_CONCURRENCY, async (t, index) => {
 					const result = await runSingleAgent(
 						ctx.cwd,
-						agents,
+						agentScope,
 						t.agent,
 						t.task,
 						t.cwd,
@@ -666,7 +726,7 @@ export default function (pi: ExtensionAPI) {
 			if (params.agent && params.task) {
 				const result = await runSingleAgent(
 					ctx.cwd,
-					agents,
+					agentScope,
 					params.agent,
 					params.task,
 					params.cwd,
@@ -690,7 +750,7 @@ export default function (pi: ExtensionAPI) {
 				};
 			}
 
-			const available = agents.map((a) => `${a.name} (${a.source})`).join(", ") || "none";
+			const available = availableAgents.map((a) => `${a.name} (${a.source})`).join(", ") || "none";
 			return {
 				content: [{ type: "text", text: `Invalid parameters. Available agents: ${available}` }],
 				details: makeDetails("single")([]),

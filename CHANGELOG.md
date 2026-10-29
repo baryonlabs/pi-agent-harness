@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Fixed
+- **에이전트 조회가 세션 cwd만 보던 문제** (`extensions/subagent/index.ts`): `subagent` 도구가 task별 `cwd`를 받는데도 에이전트 조회는 항상 세션 cwd 기준이라, 다른 디렉터리에 있는 프로젝트 에이전트(.pi/agents)를 `cwd`로 지정해 위임하면 `Unknown agent ... Available agents: none`로 실패했다. 이제 각 task의 `cwd`(없으면 세션 cwd) 기준으로 조회하고, project 에이전트 확인 프롬프트와 "Available agents" 목록도 같은 기준으로 계산한다.
+- **리포트를 파일로 남겨야 하는 에이전트가 쓸 수 없던 문제** (`skills/harness/**`, `examples/repo-audit/**`): 문서와 예제 에이전트는 `tools` 화이트리스트에 `write`가 없어 `_workspace/` 산출물을 직접 쓸 수 없었다(요약만 메인 컨텍스트로 전달). 리포트를 남기는 에이전트에는 `write`를 포함하고 `edit`는 제외하는 규칙으로 통일했다.
+
 ### Added
 - 신규 에이전트/스킬 생성 전 중복 검토 단계 (Phase 3-0, Phase 4-0)
 - `references/agent-design-patterns.md` "에이전트 재사용 설계" 섹션
@@ -13,6 +17,7 @@
 - Phase 선택 매트릭스에 3-0/4-0 명시
 - Phase 2-3에 재사용 검토 단계 포인터 추가
 - 산출물 체크리스트에 재사용 검토 항목 2개 추가
+- `extensions/subagent/README.md`의 디렉터리 구조 설명을 실제 패키지 구성에 맞춤(예제 에이전트/프롬프트는 `examples/repo-audit/` 참조)
 
 ---
 
