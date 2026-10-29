@@ -19,10 +19,10 @@ pi 위임 모드(single/parallel/chain)로 구현한 하네스 예시 모음. �
 
 | 에이전트 | model | tools | 역할 | 출력 |
 |---------|-------|-------|------|------|
-| official-researcher | claude-haiku-4-5 | read, grep, find, ls, bash | 공식 문서/블로그 | 02_official.md |
-| media-researcher | claude-haiku-4-5 | read, grep, find, ls, bash | 미디어/투자 | 02_media.md |
-| community-researcher | claude-haiku-4-5 | read, grep, find, ls, bash | 커뮤니티/SNS | 02_community.md |
-| background-researcher | claude-sonnet-4-5 | read, grep, find, ls, bash | 배경/경쟁/학술 | 02_background.md |
+| official-researcher | claude-haiku-4-5 | read, grep, find, ls, bash, write | 공식 문서/블로그 | 02_official.md |
+| media-researcher | claude-haiku-4-5 | read, grep, find, ls, bash, write | 미디어/투자 | 02_media.md |
+| community-researcher | claude-haiku-4-5 | read, grep, find, ls, bash, write | 커뮤니티/SNS | 02_community.md |
+| background-researcher | claude-sonnet-4-5 | read, grep, find, ls, bash, write | 배경/경쟁/학술 | 02_background.md |
 | (메인 = 통합자) | — | — | 종합 보고서 | 종합보고서.md |
 
 > 조사 에이전트는 정찰 성격이라 haiku로 충분, 배경 분석은 추론이 더 필요해 sonnet. 각 에이전트는 `.pi/agents/{name}.md`로 정의하고 역할·조사 범위·출력 경로를 본문에 명시.
@@ -147,11 +147,13 @@ chain: [webtoon-artist 생성] → [webtoon-reviewer 검수] → [webtoon-artist
 ---
 name: webtoon-reviewer
 description: 웹툰 패널의 구도·캐릭터 일관성·텍스트 가독성·연출을 검수한다
-tools: read, grep, find, ls
+tools: read, grep, find, ls, write
 model: claude-sonnet-4-5
 ---
 
-당신은 웹툰 패널의 품질을 검수하는 전문가입니다. 시각적 완성도, 스토리 전달력, 캐릭터 일관성을 기준으로 패널을 평가합니다.
+당신은 웹툰 패널의 품질을 검수하는 전문가입니다.
+
+> `write`는 지정된 리포트 파일에만 쓴다. 패널 원본은 절대 고치지 않는다. 시각적 완성도, 스토리 전달력, 캐릭터 일관성을 기준으로 패널을 평가합니다.
 
 ## 핵심 역할
 1. 각 패널의 구도와 시각적 완성도 평가
@@ -205,9 +207,9 @@ Claude 버전은 리뷰어들이 `SendMessage`로 직접 교차 소통했다(sec
 
 | 에이전트 | model | tools |
 |---------|-------|-------|
-| security-reviewer | claude-sonnet-4-5 | read, grep, find, ls, bash (read-only) |
-| performance-reviewer | claude-sonnet-4-5 | read, grep, find, ls, bash (read-only) |
-| test-reviewer | claude-sonnet-4-5 | read, grep, find, ls, bash (read-only) |
+| security-reviewer | claude-sonnet-4-5 | read, grep, find, ls, bash (read-only), write (리포트 한정) |
+| performance-reviewer | claude-sonnet-4-5 | read, grep, find, ls, bash (read-only), write (리포트 한정) |
+| test-reviewer | claude-sonnet-4-5 | read, grep, find, ls, bash (read-only), write (리포트 한정) |
 
 > bash는 `git diff`/`git log` 등 read-only 명령만 쓰도록 각 에이전트 본문에 명시.
 
